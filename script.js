@@ -146,38 +146,42 @@ function openEmailClient(client, emailData) {
 }
 
 document.documentElement.style.setProperty('--animate-duration', '0.5s');
+
+// Country-specific configurations
+const countryConfigs = {
+  UK: {
+    cities: ['London', 'Birmingham', 'Manchester', 'Liverpool', 'Leeds',
+      'Sheffield', 'Bristol', 'Newcastle', 'Nottingham', 'Leicester',
+      'Cambridge', 'Oxford', 'Edinburgh', 'Glasgow', 'Cardiff', 'Belfast'],
+    currencySymbol: '£',
+    sheetName: 'UK'
+  },
+  Australia: {
+    cities: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
+      'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Hobart',
+      'Darwin', 'Cairns', 'Townsville', 'Geelong'],
+    currencySymbol: 'A$',
+    sheetName: 'Australia'
+  },
+  Europe: {
+    cities: ['Paris', 'Berlin', 'Amsterdam', 'Barcelona', 'Madrid',
+      'Rome', 'Milan', 'Vienna', 'Prague', 'Copenhagen', 'Stockholm',
+      'Dublin', 'Lisbon', 'Athens', 'Warsaw'],
+    currencySymbol: '€',
+    sheetName: 'Europe'
+  }
+};
+
+// Global variable for current country
+let currentCountry = 'UK';
+
 document.addEventListener('DOMContentLoaded', function () {
   // Configuration
   const config = {
     spreadsheetId: '1UqQev32I997yJ7BVYjCf-VKt2NUS7mat1n0LZn_G6bI',
     apiKey: 'AIzaSyA03sD9ydP_SbJdntHVND5Htb4PkqQDx_c',
     sheetName: 'UK', // Default sheet
-    range: 'A1:J100'
-  };
-
-  // Country-specific configurations
-  const countryConfigs = {
-    UK: {
-      cities: ['London', 'Birmingham', 'Manchester', 'Liverpool', 'Leeds',
-        'Sheffield', 'Bristol', 'Newcastle', 'Nottingham', 'Leicester',
-        'Cambridge', 'Oxford', 'Edinburgh', 'Glasgow', 'Cardiff', 'Belfast'],
-      currencySymbol: '£',
-      sheetName: 'UK'
-    },
-    Australia: {
-      cities: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
-        'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Hobart',
-        'Darwin', 'Cairns', 'Townsville', 'Geelong'],
-      currencySymbol: 'A$',
-      sheetName: 'Australia'
-    },
-    Europe: {
-      cities: ['Paris', 'Berlin', 'Amsterdam', 'Barcelona', 'Madrid',
-        'Rome', 'Milan', 'Vienna', 'Prague', 'Copenhagen', 'Stockholm',
-        'Dublin', 'Lisbon', 'Athens', 'Warsaw'],
-      currencySymbol: '€',
-      sheetName: 'Europe'
-    }
+    range: 'A1:K1000' // Expanded range to include more rows and the Program_Name column
   };
 
   const fieldsOfStudy = ['Computer Science', 'Business Administration', 'Engineering',
@@ -185,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function () {
     'Architecture', 'Education', 'Biology', 'Chemistry'];
 
   // Initialize the page
-  let currentCountry = 'UK';
   populateDropdowns(currentCountry);
   testConnection();
 
@@ -253,92 +256,156 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       const data = await fetchDataFromGoogleSheets(config);
       if (data && data.length > 0) {
-        displayResults(data.slice(0, 5)); // Show first 5 records for testing
+        console.log('Test data received:', data.slice(0, 5));
+        displayFilteredResults(data.slice(0, 5), {}); // Pass empty filters for initial display
       } else {
+        console.error('Data loaded but empty');
         displayError(new Error('Data loaded but empty'));
       }
     } catch (error) {
+      console.error('Test connection error:', error);
       displayError(error);
     }
   }
 
   // Fetch data from Google Sheets by using google API via Google cloud console
   async function fetchDataFromGoogleSheets({ spreadsheetId, apiKey, sheetName, range }) {
+    console.log('Fetching data from sheet:', sheetName);
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!${range}?key=${apiKey}`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    try {
+      console.log('Fetching from URL:', url);
+      const response = await fetch(url);
+      console.log('Response status:', response.status);
 
-    const data = await response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, details: ${errorText}`);
+      }
 
-    if (!data.values || data.values.length === 0) {
-      throw new Error('No data found in the sheet');
-    }
+      const data = await response.json();
+      console.log('Raw data received:', data);
 
-    // Transform the data into an array of objects
-    const headers = data.values[0].map(header =>
-      header.trim()
-        .replace(/ /g, '_')
-        .replace(/\(/g, '')
-        .replace(/\)/g, '')
-    );
+      if (!data.values) {
+        console.error('No values in response:', data);
+        throw new Error('No data values in response');
+      }
 
-    return data.values.slice(1).map(row => {
-      const obj = {};
-      headers.forEach((header, i) => {
-        obj[header] = row[i] || 'N/A';
+      if (data.values.length === 0) {
+        console.error('Empty values array in response');
+        throw new Error('No data found in the sheet');
+      }
+
+      // Transform the data into an array of objects
+      const headers = data.values[0].map(header =>
+        header.trim()
+          .replace(/ /g, '_')
+          .replace(/[()]/g, '')
+      );
+      console.log('Processed headers:', headers);
+
+      const processedData = data.values.slice(1).map(row => {
+        const obj = {};
+        headers.forEach((header, i) => {
+          obj[header] = (row[i] || '').trim() || 'N/A';
+        });
+        return obj;
       });
-      return obj;
-    });
+
+      console.log('Processed data sample:', processedData.slice(0, 2));
+      return processedData;
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw new Error(`Failed to fetch data: ${error.message}`);
+    }
   }
 
   // Display results in the table
   function displayFilteredResults(universities, activeFilters) {
-    const tableBody = document.querySelector('#resultsTable tbody');
-    tableBody.innerHTML = '';
+    console.log('Displaying filtered results:', universities);
+    console.log('Active filters:', activeFilters);
 
-    if (!universities || universities.length === 0) {
-      tableBody.innerHTML = `
-            <tr>
-                <td colspan="10" class="no-results">
-                    <div class="no-results-content">
-                        <h3>No universities match your degree selection</h3>
-                        <p>Try adjusting your filters:</p>
-                        <ul>
-                            ${activeFilters.locations?.length ? '<li>Choose different locations</li>' : ''}
-                            ${activeFilters.englishTests?.length ? '<li>Select different English tests</li>' : ''}
-                            ${activeFilters.cgpa ? '<li>Widen your score range</li>' : ''}
-                            ${activeFilters.fields?.length ? '<li>Choose different fields of study</li>' : ''}
-                            ${activeFilters.fee ? '<li>Adjust your fee range</li>' : ''}
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        `;
+    const tableBody = document.querySelector('#resultsTable tbody');
+    if (!tableBody) {
+      console.error('Table body element not found');
       return;
     }
 
-    universities.forEach((uni, index) => {
-      const row = document.createElement('tr');
-      row.style.animationDelay = `${index * 0.05}s`;
-      row.classList.add('animate__animated', 'animate__fadeInUp');
-      row.innerHTML = `
-            <td>${escapeHtml(uni.University_Name || 'N/A')}</td>
-            <td class="degree-match">${escapeHtml(uni.Degree || 'N/A')}</td>
-            <td>${formatListItems(uni.Location, activeFilters.locations)}</td>
-            <td>${formatScore(uni.Percentage_CGPA, activeFilters.cgpa)}</td>
-            <td>${formatListItems(uni.English_Test, activeFilters.englishTests, /,\s*|\/|and|or/)}</td>
-            <td>${escapeHtml(uni.Study_Gap || 'N/A')}</td>
-            <td>${formatListItems(uni.Field_of_Study, activeFilters.fields)}</td>
-            <td>${formatCurrency(uni.Fee, activeFilters.fee)}</td>
-            <td>${formatCurrency(uni.Initial_Deposit)}</td>
-            <td>${escapeHtml(uni.Other_Remarks || 'N/A')}</td>
-            <td><input type="text" class="program-name-input" placeholder="Enter program name"></td>
+    tableBody.innerHTML = '';
+
+    if (!universities || universities.length === 0) {
+      console.log('No universities to display');
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="11" class="no-results">
+            <div class="no-results-content">
+              <h3>No universities match your selection</h3>
+              <p>Try adjusting your filters:</p>
+              <ul>
+                ${activeFilters.locations?.length ? '<li>Choose different locations</li>' : ''}
+                ${activeFilters.englishTests?.length ? '<li>Select different English tests</li>' : ''}
+                ${activeFilters.cgpa ? '<li>Widen your score range</li>' : ''}
+                ${activeFilters.fields?.length ? '<li>Choose different fields of study</li>' : ''}
+                ${activeFilters.fee ? '<li>Adjust your fee range</li>' : ''}
+              </ul>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    try {
+      universities.forEach((uni, index) => {
+        console.log(`Processing university ${index + 1}:`, uni);
+        const row = document.createElement('tr');
+        row.style.animationDelay = `${index * 0.05}s`;
+        row.classList.add('animate__animated', 'animate__fadeInUp');
+
+        // Ensure all required fields are present
+        const safeUni = {
+          University_Name: uni.University_Name || 'N/A',
+          Degree: uni.Degree || 'N/A',
+          Location: uni.Location || 'N/A',
+          Percentage_CGPA: uni.Percentage_CGPA || 'N/A',
+          English_Test: uni.English_Test || 'N/A',
+          Study_Gap: uni.Study_Gap || 'N/A',
+          Field_of_Study: uni.Field_of_Study || 'N/A',
+          Fee: uni.Fee || 'N/A',
+          Initial_Deposit: uni.Initial_Deposit || 'N/A',
+          Other_Remarks: uni.Other_Remarks || 'N/A'
+        };
+
+        row.innerHTML = `
+          <td>${escapeHtml(safeUni.University_Name)}</td>
+          <td class="degree-match">${escapeHtml(safeUni.Degree)}</td>
+          <td>${formatListItems(safeUni.Location, activeFilters.locations)}</td>
+          <td>${formatScore(safeUni.Percentage_CGPA, activeFilters.cgpa)}</td>
+          <td>${formatListItems(safeUni.English_Test, activeFilters.englishTests, /,\s*|\/|and|or/)}</td>
+          <td>${escapeHtml(safeUni.Study_Gap)}</td>
+          <td>${formatListItems(safeUni.Field_of_Study, activeFilters.fields)}</td>
+          <td>${formatCurrency(safeUni.Fee)}</td>
+          <td>${formatCurrency(safeUni.Initial_Deposit)}</td>
+          <td>${escapeHtml(safeUni.Other_Remarks)}</td>
+          <td><input type="text" class="program-name-input" placeholder="Enter program name"></td>
         `;
-      tableBody.appendChild(row);
-    });
+
+        tableBody.appendChild(row);
+      });
+
+      console.log('Finished displaying universities');
+    } catch (error) {
+      console.error('Error displaying results:', error);
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="11" style="text-align: center; color: red;">
+            Error displaying results. Please try again.
+          </td>
+        </tr>
+      `;
+    }
   }
 
 
@@ -381,14 +448,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     return displayValue;
-  }
-
-  // Helper function to format currency
-  function formatCurrency(value) {
-    if (!value) return 'N/A';
-    if (value.includes('£')) return value;
-    const num = parseFloat(value.replace(/[^\d.]/g, ''));
-    return isNaN(num) ? value : '£' + num.toLocaleString('en-GB');
   }
 
   // Display error message
@@ -543,6 +602,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+
 // Download functionality
 let downloadMenuVisible = false;
 
@@ -911,130 +971,177 @@ function downloadAsCSV(data) {
 
 // Update downloadAsPDF function to handle filtered data
 function downloadAsPDF(data, clientDetails) {
-  const { jsPDF } = window.jspdf;
+  try {
+    console.log('Starting PDF generation...');
+    console.log('Data:', data);
+    console.log('Client Details:', clientDetails);
+    console.log('Current Country:', currentCountry);
+    console.log('Country Config:', countryConfigs[currentCountry]);
 
-  // Create a new PDF with optimized settings
-  const doc = new jsPDF({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: 'a4'
-  });
+    // Make sure jsPDF is available
+    if (typeof window.jsPDF === 'undefined') {
+      throw new Error('jsPDF library not loaded');
+    }
 
-  // Add title with smaller font
-  doc.setFontSize(14);
-  doc.text('APTITUDE MIGRATION - Options as per client Profile', 14, 15);
+    // Make sure we have data
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error('No data available to generate PDF');
+    }
 
-  // Add client details
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.text(`Client Name: ${clientDetails.clientName}`, 14, 25);
-  doc.text(`City: ${clientDetails.clientCity}`, 14, 32);
+    // Make sure we have valid country configuration
+    if (!countryConfigs[currentCountry]) {
+      throw new Error('Invalid country configuration');
+    }
 
-  // Add date
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 39);
+    console.log('Creating PDF document...');
+    // Initialize jsPDF
+    const doc = new window.jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
 
-  // Prepare data with proper text handling
-  const headers = [
-    { title: "University", dataKey: "University_Name" },
-    { title: "Degree", dataKey: "Degree" },
-    { title: "Location", dataKey: "Location" },
-    { title: "Score", dataKey: "Percentage_CGPA" },
-    { title: "English Test", dataKey: "English_Test" },
-    { title: "Study Gap", dataKey: "Study_Gap" },
-    { title: "Field", dataKey: "Field_of_Study" },
-    { title: `Fee (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Fee" },
-    { title: `Deposit (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Initial_Deposit" },
-    { title: "Remarks", dataKey: "Other_Remarks" },
-    { title: "Program Name", dataKey: "Program_Name" }
-  ];
+    console.log('Adding header content...');
+    // Add title with smaller font
+    doc.setFontSize(14);
+    doc.text('APTITUDE MIGRATION - Options as per client Profile', 14, 15);
 
-  // Process data to ensure proper formatting
-  const pdfData = data.map(row => {
-    return {
-      University_Name: row.University_Name || 'N/A',
-      Degree: row.Degree || 'N/A',
-      Location: row.Location || 'N/A',
-      Percentage_CGPA: row.Percentage_CGPA || 'N/A',
-      English_Test: row.English_Test || 'N/A',
-      Study_Gap: row.Study_Gap || 'N/A',
-      Field_of_Study: row.Field_of_Study || 'N/A',
-      Fee: formatCurrencyForPDF(row.Fee),
-      Initial_Deposit: formatCurrencyForPDF(row.Initial_Deposit),
-      Other_Remarks: row.Other_Remarks || 'N/A',
-      Program_Name: row.Program_Name || 'N/A'
-    };
-  });
+    // Add client details
+    doc.setFontSize(11);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Client Name: ${clientDetails.clientName}`, 14, 25);
+    doc.text(`City: ${clientDetails.clientCity}`, 14, 32);
 
-  // Generate the table with improved settings
-  doc.autoTable({
-    head: [headers.map(h => h.title)],
-    body: pdfData.map(row => headers.map(h => row[h.dataKey])),
-    startY: 45, // Adjusted starting position for the table
-    margin: { left: 5, right: 5 },
-    styles: {
-      fontSize: 7,
-      cellPadding: 2,
-      overflow: 'linebreak',
-      valign: 'middle',
-      halign: 'center',
-      textColor: [40, 40, 40],
-      lineColor: [200, 200, 200],
-      lineWidth: 0.1,
-      minCellHeight: 5,
-      cellWidth: 'auto'
-    },
-    headStyles: {
-      fillColor: [52, 152, 219],
-      textColor: [255, 255, 255],
-      fontSize: 8,
-      fontStyle: 'bold',
-      halign: 'center',
-      minCellHeight: 10,
-      valign: 'middle'
-    },
-    columnStyles: {
-      0: { cellWidth: 30 }, // University
-      1: { cellWidth: 25 }, // Degree
-      2: { cellWidth: 25 }, // Location
-      3: { cellWidth: 15 }, // CGPA
-      4: { cellWidth: 25 }, // English Test
-      5: { cellWidth: 15 }, // Study Gap
-      6: { cellWidth: 25 }, // Field
-      7: { cellWidth: 20 }, // Fee
-      8: { cellWidth: 15 }, // Deposit
-      9: { cellWidth: 35 }, // Remarks
-      10: { cellWidth: 25 } // Program Name
-    },
-    didParseCell: function (data) {
-      const text = data.cell.text;
-      if (Array.isArray(text) && text.length > 0) {
-        const textLength = text.join(' ').length;
-        if (textLength > 50) {
-          data.cell.styles.minCellHeight = Math.max(data.cell.styles.minCellHeight, textLength / 20);
+    // Add date
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 39);
+
+    console.log('Preparing table data...');
+    // Prepare data with proper text handling
+    const headers = [
+      { title: "University", dataKey: "University_Name" },
+      { title: "Degree", dataKey: "Degree" },
+      { title: "Location", dataKey: "Location" },
+      { title: "Score", dataKey: "Percentage_CGPA" },
+      { title: "English Test", dataKey: "English_Test" },
+      { title: "Study Gap", dataKey: "Study_Gap" },
+      { title: "Field", dataKey: "Field_of_Study" },
+      { title: `Fee (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Fee" },
+      { title: `Deposit (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Initial_Deposit" },
+      { title: "Remarks", dataKey: "Other_Remarks" },
+      { title: "Program Name", dataKey: "Program_Name" }
+    ];
+
+    // Process data to ensure proper formatting and handle null/undefined values
+    const pdfData = data.map(row => {
+      const processedRow = {};
+      headers.forEach(header => {
+        let value = row[header.dataKey];
+        // Handle null/undefined values
+        if (value === null || value === undefined) {
+          value = 'N/A';
+        }
+        // Handle special cases for Fee and Initial_Deposit
+        if (header.dataKey === 'Fee' || header.dataKey === 'Initial_Deposit') {
+          processedRow[header.dataKey] = formatCurrencyForPDF(value);
+        } else {
+          processedRow[header.dataKey] = String(value);
+        }
+      });
+      return processedRow;
+    });
+
+    console.log('Generating table...');
+    // Generate the table with improved settings
+    doc.autoTable({
+      head: [headers.map(h => h.title)],
+      body: pdfData.map(row => headers.map(h => row[h.dataKey])),
+      startY: 45,
+      margin: { left: 5, right: 5 },
+      styles: {
+        fontSize: 7,
+        cellPadding: 2,
+        overflow: 'linebreak',
+        valign: 'middle',
+        halign: 'center',
+        textColor: [40, 40, 40],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.1,
+        minCellHeight: 5,
+        cellWidth: 'auto'
+      },
+      headStyles: {
+        fillColor: [52, 152, 219],
+        textColor: [255, 255, 255],
+        fontSize: 8,
+        fontStyle: 'bold',
+        halign: 'center',
+        minCellHeight: 10,
+        valign: 'middle'
+      },
+      columnStyles: {
+        0: { cellWidth: 30 }, // University
+        1: { cellWidth: 25 }, // Degree
+        2: { cellWidth: 25 }, // Location
+        3: { cellWidth: 15 }, // CGPA
+        4: { cellWidth: 25 }, // English Test
+        5: { cellWidth: 15 }, // Study Gap
+        6: { cellWidth: 25 }, // Field
+        7: { cellWidth: 20 }, // Fee
+        8: { cellWidth: 15 }, // Deposit
+        9: { cellWidth: 35 }, // Remarks
+        10: { cellWidth: 25 } // Program Name
+      },
+      didParseCell: function (data) {
+        try {
+          const text = data.cell.text;
+          if (Array.isArray(text) && text.length > 0) {
+            const textLength = text.join(' ').length;
+            if (textLength > 50) {
+              data.cell.styles.minCellHeight = Math.max(data.cell.styles.minCellHeight, textLength / 20);
+            }
+          }
+          data.cell.styles.valign = 'middle';
+        } catch (e) {
+          console.error('Error in didParseCell:', e);
+        }
+      },
+      willDrawCell: function (data) {
+        try {
+          if (data.cell.text.length > 0) {
+            data.cell.styles.cellPadding = 2;
+          }
+        } catch (e) {
+          console.error('Error in willDrawCell:', e);
+        }
+      },
+      didDrawPage: function (data) {
+        try {
+          doc.setFontSize(7);
+          doc.setTextColor(150);
+          doc.text(
+            `Page ${data.pageNumber} of ${data.pageCount}`,
+            doc.internal.pageSize.getWidth() - 15,
+            doc.internal.pageSize.getHeight() - 5
+          );
+        } catch (e) {
+          console.error('Error in didDrawPage:', e);
         }
       }
-      data.cell.styles.valign = 'middle';
-    },
-    willDrawCell: function (data) {
-      if (data.cell.text.length > 0) {
-        data.cell.styles.cellPadding = 2;
-      }
-    },
-    didDrawPage: function (data) {
-      doc.setFontSize(7);
-      doc.setTextColor(150);
-      doc.text(
-        `Page ${data.pageNumber} of ${data.pageCount}`,
-        doc.internal.pageSize.getWidth() - 15,
-        doc.internal.pageSize.getHeight() - 5
-      );
-    }
-  });
+    });
 
-  // Save the PDF
-  doc.save(`university_results_${new Date().toISOString().slice(0, 10)}.pdf`);
+    console.log('Saving PDF...');
+    // Save the PDF
+    const filename = `university_results_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(filename);
+    console.log('PDF generated successfully!');
+
+  } catch (error) {
+    console.error('Detailed error in PDF generation:', error);
+    console.error('Error stack:', error.stack);
+    alert(`Error generating PDF: ${error.message}. Please check the console for details.`);
+  }
 }
 
 // Helper function to truncate long text
@@ -1043,7 +1150,7 @@ function truncateText(text, maxLength) {
   return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
 }
 
-// Helper function for currency formatting
+// Helper function for currency formatting in PDF
 function formatCurrencyForPDF(value, country = currentCountry) {
   if (!value) return 'N/A';
   const symbol = countryConfigs[country].currencySymbol;
