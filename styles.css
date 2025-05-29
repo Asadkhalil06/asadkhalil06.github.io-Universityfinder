@@ -116,8 +116,9 @@ table {
 th,
 td {
   padding: 12px 15px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #ddd;
+  vertical-align: middle;
 }
 
 th {
@@ -125,6 +126,7 @@ th {
   color: white;
   position: sticky;
   top: 0;
+  text-align: center;
 }
 
 tr:hover {
@@ -850,4 +852,132 @@ tr:hover {
 .files-to-attach li i {
   margin-right: 8px;
   color: #3498db;
+}
+
+/* Multiselect Dropdown Styles */
+.multiselect-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.select-box {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.select-box .selected-text {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-box .select-arrow {
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.select-box.active .select-arrow {
+  transform: rotate(180deg);
+}
+
+.checkbox-list {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 2px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.checkbox-list.show {
+  display: block;
+}
+
+.search-box {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.checkbox-options {
+  padding: 5px 0;
+}
+
+.checkbox-list label {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkbox-list label:hover {
+  background-color: #f5f5f5;
+}
+
+.checkbox-list input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Selected item tags */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 5px 0;
+}
+
+.selected-tag {
+  background: #e8f0fe;
+  border: 1px solid #4a90e2;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  margin: 2px;
+}
+
+.selected-tag .remove {
+  margin-left: 5px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+
+.selected-tag .remove:hover {
+  color: #357abd;
+}
+
+/* Hide original checkboxes but keep them accessible */
+.checkbox-list input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
 }
