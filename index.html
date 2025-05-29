@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Finder - Aptitude Migration</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="image/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add libraries for Animation and Google font API -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Add Gmail API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+</head>
+
+<body style="scroll-behavior: smooth;">
+    <div class="container">
+        <h1>University Finder</h1>
+        <!-- Profile Entry Section -->
+        <section class="profile-section">
+            <h2>Student Profile</h2>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <select id="country" name="country">
+                        <option value="UK">United Kingdom</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Europe">Europe</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="degree">Degree Level:</label>
+                    <select id="degree" name="degree">
+                        <option value="Degree">Select Degree Level</option>
+                        <option value="Foundation">Foundation</option>
+                        <option value="Year one">Year one</option>
+                        <option value="Bachelor">Bachelor</option>
+                        <option value="Credit transfer">Credit transfer</option>
+                        <option value="Top-up">Top-up</option>
+                        <option value="Master(Taught)">Master(Taught)</option>
+                        <option value="Master(Research)">Master(Research)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>English Proficiency Tests:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="englishTest" value="IELTS"> IELTS</label>
+                        <label><input type="checkbox" name="englishTest" value="TOEFL"> TOEFL</label>
+                        <label><input type="checkbox" name="englishTest" value="PTE"> PTE</label>
+                        <label><input type="checkbox" name="englishTest" value="Duolingo"> Duolingo</label>
+                        <label><input type="checkbox" name="englishTest" value="Cambridge"> Cambridge</label>
+                        <label><input type="checkbox" name="englishTest" value="Lang Cert"> Lang Cert</label>
+                        <label><input type="checkbox" name="englishTest" value="Oxford"> Oxford</label>
+                        <label><input type="checkbox" name="englishTest" value="MOI"> MOI</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Locations:</label>
+                    <div class="checkbox-group" id="locationCheckboxes">
+                        <!-- Locations will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cgpa">Percentage/CGPA:</label>
+                    <select id="cgpa" name="cgpa">
+                        <option value="">Select Range</option>
+                        <option value="50-60">50-60%</option>
+                        <option value="60-70">60-70%</option>
+                        <option value="70-80">70-80%</option>
+                        <option value="80-90">80-90%</option>
+                        <option value="90-100">90-100%</option>
+                        <option value="2.0-2.5">2.0-2.5 CGPA</option>
+                        <option value="2.5-3.0">2.5-3.0 CGPA</option>
+                        <option value="3.0-3.5">3.0-3.5 CGPA</option>
+                        <option value="3.5-4.0">3.5-4.0 CGPA</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Field of Study:</label>
+                    <div class="checkbox-group" id="fieldCheckboxes">
+                        <!-- Fields will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fee">Fee Range (£):</label>
+                    <select id="fee" name="fee">
+                        <option value="">Select Range</option>
+                        <option value="5000-10000">£5,000-£10,000</option>
+                        <option value="10000-15000">£10,000-£15,000</option>
+                        <option value="15000-20000">£15,000-£20,000</option>
+                        <option value="20000-25000">£20,000-£25,000</option>
+                        <option value="25000-30000">£25,000-£30,000</option>
+                        <option value="30000+">£30,000+</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Find Universities</button>
+            </form>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section">
+            <h2>Matching Universities</h2>
+            <div class="action-buttons">
+                <div class="btn-group">
+                    <button id="downloadBtn" class="action-btn">
+                        <i class="fas fa-download"></i> Download
+                        <div class="download-options">
+                            <!-- PDF Span-->
+                            <span class="download-option" data-type="pdf">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </span>
+                            <!-- CSV Span-->
+                            <span class="download-option" data-type="csv">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </span>
+                        </div>
+                    </button>
+                </div>
+                <button id="emailBtn" class="action-btn">
+                    <i class="fas fa-envelope"></i> Email Results
+                </button>
+            </div>
+            <div class="table-container">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>University_Name</th>
+                            <th>Degree</th>
+                            <th>Location</th>
+                            <th>Percentage_CGPA</th>
+                            <th>English_Test</th>
+                            <th>Study_Gap</th>
+                            <th>Field_of_Study</th>
+                            <th>Fee</th>
+                            <th>Initial_Deposit</th>
+                            <th>Other_Remarks</th>
+                            <th>Program_Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Results will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Load scripts in correct order -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
