@@ -35,21 +35,49 @@
                     <select id="country" name="country">
                         <option value="UK">United Kingdom</option>
                         <option value="Australia">Australia</option>
-                        <option value="Europe">Europe</option>
+                        <option value="New Zealand">New Zealand</option>
+                        <option value="France">France</option>
+                        <option value="Finland">Finland</option>
+                        <option value="Hungary">Hungary</option>
+                        <option value="Cyprus">Cyprus</option>
+                        <option value="Austria">Austria</option>
+                        <option value="Ireland">Ireland</option>
+                        <option value="South Korea">South Korea</option>
+                        <option value="Japan">Japan</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="China">China</option>
+                        <option value="Canada">Canada</option>
+                        <option value="USA">USA</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="degree">Degree Level:</label>
                     <select id="degree" name="degree">
-                        <option value="Degree">Select Degree Level</option>
-                        <option value="Foundation">Foundation</option>
-                        <option value="Year one">Year one</option>
-                        <option value="Bachelor">Bachelor</option>
-                        <option value="Credit transfer">Credit transfer</option>
+                        <option value="">Select Degree Level</option>
+                        <option value="Foundation Year">Foundation Year</option>
+                        <option value="International Year one/Diploma">International Year one/Diploma</option>
                         <option value="Top-up">Top-up</option>
-                        <option value="Master(Taught)">Master(Taught)</option>
-                        <option value="Master(Research)">Master(Research)</option>
+                        <option value="Bachelor (2 Years)">Bachelor (2 Years)</option>
+                        <option value="Bachelor (3 Years)">Bachelor (3 Years)</option>
+                        <option value="Bachelor (4 Years)">Bachelor (4 Years)</option>
+                        <option value="Master (Taught)">Master (Taught)</option>
+                        <option value="Master (Research)">Master (Research)</option>
+                        <option value="Graduate Certificate">Graduate Certificate</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="university">University/College:</label>
+                    <select id="university" name="university">
+                        <option value="">Select University/College</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="course">Course:</label>
+                    <select id="course" name="course">
+                        <option value="">Select Course</option>
                     </select>
                 </div>
 
@@ -69,8 +97,19 @@
 
                 <div class="form-group">
                     <label>Preferred Locations:</label>
-                    <div class="checkbox-group" id="locationCheckboxes">
-                        <!-- Locations will be populated by JavaScript -->
+                    <div class="multiselect-dropdown">
+                        <div class="select-box" id="locationSelectBox">
+                            <div class="selected-text">Select Locations</div>
+                            <div class="select-arrow">▼</div>
+                        </div>
+                        <div id="locationCheckboxes" class="checkbox-list">
+                            <div class="search-box">
+                                <input type="text" id="locationSearch" placeholder="Search locations...">
+                            </div>
+                            <div class="checkbox-options">
+                                <!-- Locations will be populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -142,8 +181,10 @@
                     <thead>
                         <tr>
                             <th>University_Name</th>
-                            <th>Degree</th>
                             <th>Location</th>
+                            <th>Degree</th>
+                            <th>Course</th>
+                            <th>Intake</th>
                             <th>Percentage_CGPA</th>
                             <th>English_Test</th>
                             <th>Study_Gap</th>
@@ -151,7 +192,7 @@
                             <th>Fee</th>
                             <th>Initial_Deposit</th>
                             <th>Other_Remarks</th>
-                            <th>Program_Name</th>
+                            <th>Course link</th>
                         </tr>
                     </thead>
                     <tbody>
