@@ -150,25 +150,324 @@ document.documentElement.style.setProperty('--animate-duration', '0.5s');
 // Country-specific configurations
 const countryConfigs = {
   UK: {
-    cities: ['London', 'Birmingham', 'Manchester', 'Liverpool', 'Leeds',
-      'Sheffield', 'Bristol', 'Newcastle', 'Nottingham', 'Leicester',
-      'Cambridge', 'Oxford', 'Edinburgh', 'Glasgow', 'Cardiff', 'Belfast'],
+    cities: [
+      'Aberdeen', 'Aberystwyth', 'Aldershot', 'Ashford', 'Aylesbury', 'Banbury',
+      'Bangor', 'Barnsley', 'Basildon', 'Basingstoke', 'Bath', 'Bedford',
+      'Belfast', 'Birmingham', 'Blackburn', 'Blackpool', 'Bolton', 'Bournemouth',
+      'Bradford', 'Brighton', 'Bristol', 'Burnley', 'Burton upon Trent', 'Bury',
+      'Cambridge', 'Canterbury', 'Cardiff', 'Carlisle', 'Chatham', 'Chelmsford',
+      'Cheltenham', 'Chester', 'Chesterfield', 'Chichester', 'Colchester',
+      'Coventry', 'Crawley', 'Crewe', 'Croydon', 'Darlington', 'Derby',
+      'Doncaster', 'Dover', 'Dudley', 'Dundee', 'Durham', 'Eastbourne',
+      'Edinburgh', 'Exeter', 'Falkirk', 'Falmouth', 'Folkestone', 'Glasgow',
+      'Gloucester', 'Guildford', 'Halifax', 'Harrogate', 'Hartlepool',
+      'Hastings', 'Hatfield', 'Hemel Hempstead', 'Hereford', 'High Wycombe',
+      'Huddersfield', 'Hull', 'Inverness', 'Ipswich', 'Keele', 'Kendal',
+      'Kingston upon Thames', 'Lancaster', 'Leeds', 'Leicester', 'Lincoln',
+      'Liverpool', 'London', 'Loughborough', 'Luton', 'Maidstone', 'Manchester',
+      'Mansfield', 'Middlesbrough', 'Milton Keynes', 'Newcastle upon Tyne',
+      'Newport', 'Northampton', 'Norwich', 'Nottingham', 'Oldham', 'Oxford',
+      'Peterborough', 'Plymouth', 'Poole', 'Portsmouth', 'Preston', 'Reading',
+      'Rochdale', 'Rochester', 'Rugby', 'Salford', 'Scarborough', 'Sheffield',
+      'Shrewsbury', 'Slough', 'Southampton', 'Southend-on-Sea', 'St Albans',
+      'St Andrews', 'Stafford', 'Staines', 'Stevenage', 'Stirling',
+      'Stoke-on-Trent', 'Sunderland', 'Swansea', 'Swindon', 'Taunton',
+      'Telford', 'Torquay', 'Truro', 'Tunbridge Wells', 'Wakefield',
+      'Warrington', 'Warwick', 'Watford', 'West Bromwich', 'Wigan',
+      'Winchester', 'Windsor', 'Wolverhampton', 'Worcester', 'Worthing',
+      'Wrexham', 'Yeovil', 'York'
+    ],
     currencySymbol: '£',
     sheetName: 'UK'
   },
   Australia: {
-    cities: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
-      'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Hobart',
-      'Darwin', 'Cairns', 'Townsville', 'Geelong'],
+    cities: [
+      'Adelaide', 'Albany', 'Albury', 'Alice Springs', 'Armidale', 'Ballarat',
+      'Bathurst', 'Bendigo', 'Brisbane', 'Broken Hill', 'Broome', 'Bunbury',
+      'Bundaberg', 'Busselton', 'Cairns', 'Canberra', 'Casino', 'Coffs Harbour',
+      'Darwin', 'Devonport', 'Dubbo', 'Echuca', 'Emerald', 'Esperance',
+      'Frankston', 'Fremantle', 'Geelong', 'Geraldton', 'Gladstone', 'Gold Coast',
+      'Goulburn', 'Grafton', 'Griffith', 'Hervey Bay', 'Hobart', 'Horsham',
+      'Kalgoorlie', 'Karratha', 'Katherine', 'Kwinana', 'Launceston', 'Lismore',
+      'Lithgow', 'Mackay', 'Maitland', 'Mandurah', 'Melbourne', 'Mildura',
+      'Mount Gambier', 'Mount Isa', 'Newcastle', 'Nowra', 'Orange',
+      'Palm Beach', 'Parramatta', 'Penrith', 'Perth', 'Port Augusta',
+      'Port Hedland', 'Port Lincoln', 'Port Macquarie', 'Port Pirie',
+      'Queanbeyan', 'Rockhampton', 'Shepparton', 'Sunshine Coast', 'Sydney',
+      'Tamworth', 'Toowoomba', 'Townsville', 'Traralgon', 'Tweed Heads',
+      'Wagga Wagga', 'Warrnambool', 'Whyalla', 'Wollongong', 'Wonthaggi',
+      'Wyong'
+    ],
     currencySymbol: 'A$',
     sheetName: 'Australia'
   },
-  Europe: {
-    cities: ['Paris', 'Berlin', 'Amsterdam', 'Barcelona', 'Madrid',
-      'Rome', 'Milan', 'Vienna', 'Prague', 'Copenhagen', 'Stockholm',
-      'Dublin', 'Lisbon', 'Athens', 'Warsaw'],
+  'New Zealand': {
+    cities: [
+      'Alexandra', 'Ashburton', 'Auckland', 'Blenheim', 'Cambridge', 'Christchurch',
+      'Dunedin', 'Feilding', 'Gisborne', 'Gore', 'Hamilton', 'Hastings',
+      'Hawera', 'Huntly', 'Invercargill', 'Kaikohe', 'Kaikoura', 'Kaitaia',
+      'Kapiti', 'Kerikeri', 'Levin', 'Lower Hutt', 'Manukau', 'Masterton',
+      'Matamata', 'Morrinsville', 'Napier', 'Nelson', 'New Plymouth',
+      'Oamaru', 'Orewa', 'Palmerston North', 'Papakura', 'Paraparaumu',
+      'Porirua', 'Pukekohe', 'Queenstown', 'Rangiora', 'Rotorua', 'Taupo',
+      'Tauranga', 'Te Awamutu', 'Thames', 'Timaru', 'Tokoroa', 'Upper Hutt',
+      'Wanaka', 'Wanganui', 'Wellington', 'Westport', 'Whakatane',
+      'Whanganui', 'Whangarei'
+    ],
+    currencySymbol: 'NZ$',
+    sheetName: 'New Zealand'
+  },
+  France: {
+    cities: [
+      'Aix-en-Provence', 'Ajaccio', 'Amiens', 'Angers', 'Angoulême', 'Annecy',
+      'Antibes', 'Antony', 'Argenteuil', 'Arles', 'Asnières-sur-Seine', 'Aubervilliers',
+      'Aulnay-sous-Bois', 'Avignon', 'Bayonne', 'Beauvais', 'Belfort', 'Besançon',
+      'Béziers', 'Bordeaux', 'Boulogne-Billancourt', 'Bourg-en-Bresse', 'Bourges',
+      'Brest', 'Caen', 'Calais', 'Cannes', 'Cergy', 'Chambéry', 'Champigny-sur-Marne',
+      'Charleville-Mézières', 'Châteauroux', 'Chelles', 'Cholet', 'Clermont-Ferrand',
+      'Colmar', 'Colombes', 'Courbevoie', 'Créteil', 'Dijon', 'Douai', 'Drancy',
+      'Dunkerque', 'Évry', 'Fontenay-sous-Bois', 'Grenoble', 'Issy-les-Moulineaux',
+      'Ivry-sur-Seine', 'La Rochelle', 'La Roche-sur-Yon', 'Le Havre', 'Le Mans',
+      'Levallois-Perret', 'Lille', 'Limoges', 'Lorient', 'Lyon', 'Marseille',
+      'Metz', 'Montauban', 'Montpellier', 'Montreuil', 'Mulhouse', 'Nancy',
+      'Nanterre', 'Nantes', 'Narbonne', 'Nice', 'Nîmes', 'Niort', 'Orléans',
+      'Paris', 'Pau', 'Perpignan', 'Poitiers', 'Quimper', 'Reims', 'Rennes',
+      'Rouen', 'Saint-Denis', 'Saint-Étienne', 'Saint-Maur-des-Fossés',
+      'Saint-Nazaire', 'Saint-Paul', 'Saint-Pierre', 'Saint-Quentin', 'Strasbourg',
+      'Toulon', 'Toulouse', 'Tours', 'Troyes', 'Valence', 'Valenciennes',
+      'Vannes', 'Versailles', 'Vienne', 'Villeurbanne', 'Vitry-sur-Seine'
+    ],
     currencySymbol: '€',
-    sheetName: 'Europe'
+    sheetName: 'France'
+  },
+  Finland: {
+    cities: [
+      'Espoo', 'Forssa', 'Hamina', 'Hanko', 'Heinola', 'Helsinki', 'Hyvinkää',
+      'Hämeenlinna', 'Iisalmi', 'Imatra', 'Jakobstad', 'Joensuu', 'Jyväskylä',
+      'Järvenpää', 'Kaarina', 'Kajaani', 'Kankaanpää', 'Karkkila', 'Kaskinen',
+      'Kauhava', 'Kauniainen', 'Kemi', 'Kemijärvi', 'Kerava', 'Kirkkonummi',
+      'Kitee', 'Kiuruvesi', 'Kokemäki', 'Kokkola', 'Kotka', 'Kouvola',
+      'Kristiinankaupunki', 'Kuhmo', 'Kuopio', 'Kurikka', 'Kuusamo',
+      'Lahti', 'Laitila', 'Lappeenranta', 'Lapua', 'Lieksa', 'Lohja',
+      'Loimaa', 'Loviisa', 'Maarianhamina', 'Mikkeli', 'Mänttä-Vilppula',
+      'Naantali', 'Nokia', 'Nurmes', 'Nurmijärvi', 'Orimattila', 'Oulu',
+      'Outokumpu', 'Paimio', 'Parainen', 'Pieksämäki', 'Pietarsaari',
+      'Pori', 'Porvoo', 'Raahe', 'Raasepori', 'Raisio', 'Rauma',
+      'Riihimäki', 'Rovaniemi', 'Saarijärvi', 'Salo', 'Sastamala',
+      'Savonlinna', 'Seinäjoki', 'Siilinjärvi', 'Sipoo', 'Somero',
+      'Tampere', 'Tornio', 'Turku', 'Tuusula', 'Ulvila', 'Uusikaupunki',
+      'Vaasa', 'Valkeakoski', 'Vantaa', 'Varkaus', 'Viitasaari',
+      'Vilppula', 'Virrat', 'Ylivieska', 'Ylöjärvi', 'Äänekoski'
+    ],
+    currencySymbol: '€',
+    sheetName: 'Finland'
+  },
+  Hungary: {
+    cities: [
+      'Ajka', 'Baja', 'Balassagyarmat', 'Balatonfüred', 'Békés', 'Békéscsaba',
+      'Berettyóújfalu', 'Bonyhád', 'Budapest', 'Cegléd', 'Celldömölk',
+      'Csorna', 'Debrecen', 'Dombóvár', 'Dunakeszi', 'Dunaújváros', 'Eger',
+      'Érd', 'Esztergom', 'Fehérgyarmat', 'Gödöllő', 'Gyöngyös', 'Győr',
+      'Gyula', 'Hajdúböszörmény', 'Hajdúnánás', 'Hajdúszoboszló', 'Hatvan',
+      'Hódmezővásárhely', 'Jászberény', 'Kalocsa', 'Kaposvár', 'Karcag',
+      'Kazincbarcika', 'Kecskemét', 'Keszthely', 'Kiskunfélegyháza',
+      'Kiskunhalas', 'Kisvárda', 'Komárom', 'Komló', 'Körmend', 'Kőszeg',
+      'Makó', 'Marcali', 'Mezőkövesd', 'Mezőtúr', 'Miskolc', 'Mohács',
+      'Monor', 'Mosonmagyaróvár', 'Nagykanizsa', 'Nagykőrös', 'Nyíregyháza',
+      'Orosháza', 'Ózd', 'Paks', 'Pápa', 'Pécs', 'Salgótarján', 'Sárbogárd',
+      'Sárospatak', 'Sárvár', 'Sátoraljaújhely', 'Siófok', 'Sopron',
+      'Szarvas', 'Szeged', 'Székesfehérvár', 'Szekszárd', 'Szentendre',
+      'Szentes', 'Szigetszentmiklós', 'Szolnok', 'Szombathely', 'Tata',
+      'Tatabánya', 'Törökszentmiklós', 'Vác', 'Várpalota', 'Veszprém',
+      'Zalaegerszeg', 'Zalaszentgrót'
+    ],
+    currencySymbol: 'Ft',
+    sheetName: 'Hungary'
+  },
+  Cyprus: {
+    cities: [
+      'Agia Napa', 'Agios Athanasios', 'Agios Dometios', 'Agios Nikolaos',
+      'Aglandjia', 'Akaki', 'Alethriko', 'Aradippou', 'Aradhippou', 'Athienou',
+      'Dali', 'Dasoupolis', 'Deftera', 'Deryneia', 'Dhali', 'Dromolaxia',
+      'Egkomi', 'Emba', 'Engomi', 'Episkopi', 'Famagusta', 'Germasogeia',
+      'Geroskipou', 'Geri', 'Ipsonas', 'Kaimakli', 'Kakopetria', 'Kiti',
+      'Kokkinotrimithia', 'Kyrenia', 'Lakatamia', 'Lapithos', 'Larnaca',
+      'Latsia', 'Lefkara', 'Limassol', 'Livadia', 'Mammari', 'Mesa Geitonia',
+      'Morphou', 'Nicosia', 'Oroklini', 'Pachna', 'Palaiometocho', 'Paphos',
+      'Paralimni', 'Peyia', 'Polis', 'Protaras', 'Psimolofou', 'Sotira',
+      'Strovolos', 'Tseri', 'Xylofagou', 'Xylotymvou', 'Ypsonas'
+    ],
+    currencySymbol: '€',
+    sheetName: 'Cyprus'
+  },
+  Austria: {
+    cities: [
+      'Amstetten', 'Ansfelden', 'Baden', 'Bad Ischl', 'Bludenz', 'Braunau am Inn',
+      'Bregenz', 'Dornbirn', 'Eisenstadt', 'Feldkirch', 'Feldkirchen',
+      'Gänserndorf', 'Gmunden', 'Graz', 'Hallein', 'Hard', 'Hohenems',
+      'Innsbruck', 'Kapfenberg', 'Klagenfurt', 'Klosterneuburg', 'Korneuburg',
+      'Krems', 'Kufstein', 'Lauterach', 'Leonding', 'Leoben', 'Linz',
+      'Lustenau', 'Mödling', 'Perchtoldsdorf', 'Pinkafeld', 'Pöchlarn',
+      'Poysdorf', 'Rankweil', 'Ried im Innkreis', 'Röthis', 'Rust', 'Saalfelden',
+      'Salzburg', 'Sankt Pölten', 'Schwaz', 'Schwechat', 'Spittal an der Drau',
+      'Steyr', 'Stockerau', 'Telfs', 'Ternitz', 'Traiskirchen', 'Traun',
+      'Vienna', 'Villach', 'Vöcklabruck', 'Waidhofen', 'Weiz', 'Wels',
+      'Wiener Neustadt', 'Wolfsberg', 'Wörgl', 'Zeltweg', 'Zwettl'
+    ],
+    currencySymbol: '€',
+    sheetName: 'Austria'
+  },
+  Ireland: {
+    cities: [
+      'Arklow', 'Athlone', 'Athy', 'Balbriggan', 'Ballina', 'Ballinasloe',
+      'Ballybay', 'Ballyshannon', 'Bandon', 'Bantry', 'Belturbet', 'Birr',
+      'Bray', 'Bundoran', 'Carlow', 'Carrick-on-Shannon', 'Carrick-on-Suir',
+      'Cashel', 'Castlebar', 'Cavan', 'Celbridge', 'Clonmel', 'Cobh', 'Cork',
+      'Drogheda', 'Dublin', 'Dundalk', 'Dungarvan', 'Ennis', 'Enniscorthy',
+      'Fermoy', 'Galway', 'Gorey', 'Greystones', 'Kilkenny', 'Killarney',
+      'Killorglin', 'Kilrush', 'Kinsale', 'Leixlip', 'Letterkenny', 'Limerick',
+      'Lismore', 'Listowel', 'Longford', 'Loughrea', 'Macroom', 'Mallow',
+      'Maynooth', 'Midleton', 'Monaghan', 'Mullingar', 'Naas', 'Navan',
+      'Nenagh', 'New Ross', 'Newbridge', 'Portlaoise', 'Roscommon', 'Shannon',
+      'Skerries', 'Skibbereen', 'Sligo', 'Swords', 'Templemore', 'Thurles',
+      'Tipperary', 'Tralee', 'Trim', 'Tuam', 'Tullamore', 'Waterford',
+      'Westport', 'Wexford', 'Wicklow', 'Youghal'
+    ],
+    currencySymbol: '€',
+    sheetName: 'Ireland'
+  },
+  'South Korea': {
+    cities: [
+      'Andong', 'Ansan', 'Anseong', 'Anyang', 'Asan', 'Boryeong', 'Bucheon',
+      'Busan', 'Changwon', 'Cheonan', 'Cheongju', 'Chuncheon', 'Daegu',
+      'Daejeon', 'Dangjin', 'Dongducheon', 'Donghae', 'Gangneung', 'Geoje',
+      'Gimcheon', 'Gimhae', 'Gimje', 'Gimpo', 'Gongju', 'Goyang', 'Gumi',
+      'Gunpo', 'Gunsan', 'Guri', 'Gwacheon', 'Gwangju', 'Gwangmyeong',
+      'Gwangyang', 'Gyeongju', 'Gyeongsan', 'Hanam', 'Hwado', 'Hwaseong',
+      'Icheon', 'Iksan', 'Incheon', 'Jecheon', 'Jeju', 'Jeongeup', 'Jeonju',
+      'Jinju', 'Mokpo', 'Namyangju', 'Naju', 'Namwon', 'Nonsan', 'Osan',
+      'Paju', 'Pocheon', 'Pohang', 'Pyeongtaek', 'Sacheon', 'Sangju', 'Sejong',
+      'Seogwipo', 'Seongnam', 'Seoul', 'Siheung', 'Suncheon', 'Suwon', 'Taebaek',
+      'Tongyeong', 'Uijeongbu', 'Uiwang', 'Ulsan', 'Wonju', 'Yangju', 'Yangsan',
+      'Yeoju', 'Yeosu', 'Yongin'
+    ],
+    currencySymbol: '₩',
+    sheetName: 'South Korea'
+  },
+  Japan: {
+    cities: [
+      'Abiko', 'Ageo', 'Akita', 'Amagasaki', 'Anjo', 'Aomori', 'Asahikawa',
+      'Atsugi', 'Beppu', 'Chiba', 'Chofu', 'Dazaifu', 'Ebetsu', 'Ebina',
+      'Fuchu', 'Fujisawa', 'Fukui', 'Fukuoka', 'Fukushima', 'Fussa',
+      'Gifu', 'Habikino', 'Hachioji', 'Hakodate', 'Hamamatsu', 'Himeji',
+      'Hiroshima', 'Hitachi', 'Ichikawa', 'Ichinomiya', 'Iizuka', 'Ina',
+      'Inazawa', 'Isehara', 'Ishigaki', 'Iwaki', 'Iwakuni', 'Iwata',
+      'Izumo', 'Joetsu', 'Kadoma', 'Kagoshima', 'Kakogawa', 'Kamakura',
+      'Kanazawa', 'Kashiwa', 'Kawagoe', 'Kawaguchi', 'Kawasaki', 'Kitakyushu',
+      'Kobe', 'Kochi', 'Kodaira', 'Kofu', 'Komaki', 'Komatsu', 'Koriyama',
+      'Koshigaya', 'Kumagaya', 'Kumamoto', 'Kurashiki', 'Kurume', 'Kyoto',
+      'Machida', 'Maebashi', 'Matsudo', 'Matsue', 'Matsumoto', 'Matsusaka',
+      'Matsuyama', 'Mihara', 'Mishima', 'Mito', 'Miyazaki', 'Morioka',
+      'Nagano', 'Nagaoka', 'Nagasaki', 'Nagoya', 'Naha', 'Nara', 'Narashino',
+      'Narita', 'Niigata', 'Nishinomiya', 'Nishio', 'Nobeoka', 'Numazu',
+      'Obihiro', 'Odawara', 'Oita', 'Okayama', 'Okazaki', 'Omiya', 'Omuta',
+      'Osaka', 'Otaru', 'Otsu', 'Saga', 'Sagamihara', 'Saitama', 'Sakai',
+      'Sakura', 'Sapporo', 'Sasebo', 'Sendai', 'Shimonoseki', 'Shizuoka',
+      'Takamatsu', 'Takasaki', 'Takatsuki', 'Tokyo', 'Tottori', 'Toyama',
+      'Toyohashi', 'Toyonaka', 'Tsu', 'Tsukuba', 'Ueda', 'Uji', 'Utsunomiya',
+      'Wakayama', 'Yamagata', 'Yamaguchi', 'Yamato', 'Yao', 'Yokkaichi',
+      'Yokohama', 'Yokosuka'
+    ],
+    currencySymbol: '¥',
+    sheetName: 'Japan'
+  },
+  Turkey: {
+    cities: [
+      'Adana', 'Adapazari', 'Adiyaman', 'Afyonkarahisar', 'Agri', 'Aksaray',
+      'Amasya', 'Ankara', 'Antalya', 'Ardahan', 'Artvin', 'Aydin', 'Balikesir',
+      'Bartin', 'Batman', 'Bayburt', 'Bilecik', 'Bingol', 'Bitlis', 'Bolu',
+      'Burdur', 'Bursa', 'Canakkale', 'Cankiri', 'Corum', 'Denizli',
+      'Diyarbakir', 'Duzce', 'Edirne', 'Elazig', 'Erzincan', 'Erzurum',
+      'Eskisehir', 'Gaziantep', 'Giresun', 'Gumushane', 'Hakkari', 'Hatay',
+      'Igdir', 'Isparta', 'Istanbul', 'Izmir', 'Kahramanmaras', 'Karabuk',
+      'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kilis', 'Kirikkale',
+      'Kirklareli', 'Kirsehir', 'Kocaeli', 'Konya', 'Kutahya', 'Malatya',
+      'Manisa', 'Mardin', 'Mersin', 'Mugla', 'Mus', 'Nevsehir', 'Nigde',
+      'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Sanliurfa', 'Siirt',
+      'Sinop', 'Sirnak', 'Sivas', 'Tekirdag', 'Tokat', 'Trabzon', 'Tunceli',
+      'Usak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
+    ],
+    currencySymbol: '₺',
+    sheetName: 'Turkey'
+  },
+  China: {
+    cities: [
+      'Anqing', 'Anshan', 'Baoding', 'Baotou', 'Beijing', 'Bengbu', 'Benxi',
+      'Cangzhou', 'Changchun', 'Changde', 'Changsha', 'Changzhou', 'Chengdu',
+      'Chifeng', 'Chongqing', 'Dalian', 'Dandong', 'Datong', 'Dongguan',
+      'Foshan', 'Fushun', 'Fuxin', 'Fuzhou', 'Guangzhou', 'Guilin', 'Guiyang',
+      'Haikou', 'Handan', 'Hangzhou', 'Harbin', 'Hefei', 'Hengyang', 'Hohhot',
+      'Huaibei', 'Huainan', 'Huangshi', 'Huizhou', 'Jiamusi', 'Jiangmen',
+      'Jiaxing', 'Jilin', 'Jinan', 'Jingdezhen', 'Jinhua', 'Jining',
+      'Jinzhou', 'Jixi', 'Kaifeng', 'Kunming', 'Lanzhou', 'Lianyungang',
+      'Liaocheng', 'Liaoyang', 'Linyi', 'Liuzhou', 'Luoyang', 'Nanchang',
+      'Nanjing', 'Nanning', 'Nantong', 'Nanyang', 'Ningbo', 'Panjin',
+      'Qingdao', 'Qinhuangdao', 'Quanzhou', 'Rizhao', 'Shanghai', 'Shantou',
+      'Shaoxing', 'Shenyang', 'Shenzhen', 'Shijiazhuang', 'Suzhou', 'Taian',
+      'Taiyuan', 'Tangshan', 'Tianjin', 'Urumqi', 'Weifang', 'Weihai',
+      'Wenzhou', 'Wuhan', 'Wuhu', 'Wuxi', 'Xiamen', 'Xi\'an', 'Xiangtan',
+      'Xingtai', 'Xining', 'Xuzhou', 'Yancheng', 'Yangzhou', 'Yantai',
+      'Yichang', 'Yinchuan', 'Yingkou', 'Zaozhuang', 'Zhangjiakou',
+      'Zhangzhou', 'Zhanjiang', 'Zhengzhou', 'Zhenjiang', 'Zhuhai', 'Zibo'
+    ],
+    currencySymbol: '¥',
+    sheetName: 'China'
+  },
+  Canada: {
+    cities: [
+      'Abbotsford', 'Ajax', 'Barrie', 'Belleville', 'Brampton', 'Brandon',
+      'Brantford', 'Brockville', 'Burlington', 'Burnaby', 'Calgary',
+      'Cambridge', 'Charlottetown', 'Chatham-Kent', 'Chilliwack', 'Cornwall',
+      'Dartmouth', 'Delta', 'Drummondville', 'Edmonton', 'Fredericton',
+      'Gatineau', 'Guelph', 'Halifax', 'Hamilton', 'Kamloops', 'Kelowna',
+      'Kingston', 'Kitchener', 'Langley', 'Laval', 'Lethbridge', 'London',
+      'Longueuil', 'Medicine Hat', 'Mississauga', 'Moncton', 'Montreal',
+      'Nanaimo', 'New Westminster', 'Niagara Falls', 'North Bay', 'North Vancouver',
+      'Oakville', 'Oshawa', 'Ottawa', 'Peterborough', 'Pickering',
+      'Port Alberni', 'Port Coquitlam', 'Prince Albert', 'Prince George',
+      'Quebec City', 'Red Deer', 'Regina', 'Richmond', 'Richmond Hill',
+      'Saint John', 'St. Catharines', 'St. John\'s', 'Saint-Jerome',
+      'Saint-Jean-sur-Richelieu', 'Saskatoon', 'Sault Ste. Marie',
+      'Sherbrooke', 'Surrey', 'Sydney', 'Thunder Bay', 'Toronto',
+      'Trois-Rivieres', 'Vancouver', 'Vaughan', 'Victoria', 'Waterloo',
+      'West Vancouver', 'White Rock', 'Windsor', 'Winnipeg', 'Yellowknife'
+    ],
+    currencySymbol: 'C$',
+    sheetName: 'Canada'
+  },
+  USA: {
+    cities: [
+      'Albuquerque', 'Anaheim', 'Anchorage', 'Ann Arbor', 'Arlington',
+      'Atlanta', 'Austin', 'Baltimore', 'Baton Rouge', 'Berkeley', 'Birmingham',
+      'Boise', 'Boston', 'Boulder', 'Buffalo', 'Burlington', 'Cambridge',
+      'Charleston', 'Charlotte', 'Chicago', 'Cincinnati', 'Cleveland',
+      'Colorado Springs', 'Columbia', 'Columbus', 'Dallas', 'Dayton',
+      'Denver', 'Des Moines', 'Detroit', 'Durham', 'El Paso', 'Eugene',
+      'Fort Collins', 'Fort Lauderdale', 'Fort Worth', 'Fresno', 'Gainesville',
+      'Grand Rapids', 'Hartford', 'Honolulu', 'Houston', 'Indianapolis',
+      'Irvine', 'Jacksonville', 'Kansas City', 'Las Vegas', 'Lexington',
+      'Lincoln', 'Little Rock', 'Long Beach', 'Los Angeles', 'Louisville',
+      'Madison', 'Memphis', 'Miami', 'Milwaukee', 'Minneapolis', 'Nashville',
+      'New Haven', 'New Orleans', 'New York', 'Newark', 'Oakland', 'Oklahoma City',
+      'Omaha', 'Orlando', 'Philadelphia', 'Phoenix', 'Pittsburgh', 'Portland',
+      'Providence', 'Raleigh', 'Reno', 'Richmond', 'Rochester', 'Sacramento',
+      'Salt Lake City', 'San Antonio', 'San Diego', 'San Francisco', 'San Jose',
+      'Santa Barbara', 'Santa Fe', 'Seattle', 'St. Louis', 'St. Paul',
+      'Syracuse', 'Tampa', 'Tempe', 'Tucson', 'Tulsa', 'Virginia Beach',
+      'Washington DC', 'Wichita'
+    ],
+    currencySymbol: '$',
+    sheetName: 'USA'
   }
 };
 
@@ -193,25 +492,131 @@ document.addEventListener('DOMContentLoaded', function () {
   testConnection();
 
   // Handle country change
-  document.getElementById('country').addEventListener('change', function (e) {
+  document.getElementById('country').addEventListener('change', async function (e) {
     currentCountry = e.target.value;
     config.sheetName = countryConfigs[currentCountry].sheetName;
     populateDropdowns(currentCountry);
     updateCurrencyLabels(currentCountry);
-    // Clear previous results
+    await populateUniversityDropdown(currentCountry);
+    // Clear previous results and dropdowns
     document.querySelector('#resultsTable tbody').innerHTML = '';
+    document.getElementById('course').innerHTML = '<option value="">Select Course</option>';
   });
 
   // Populate dropdowns
   function populateDropdowns(country) {
-    const locationContainer = document.getElementById('locationCheckboxes');
-    locationContainer.innerHTML = ''; // Clear existing checkboxes
-    countryConfigs[country].cities.forEach(city => {
+    setupLocationDropdown(country);
+    setupFieldCheckboxes();
+    updateFeeRangeOptions(country);
+  }
+
+  function setupLocationDropdown(country) {
+    const locationContainer = document.querySelector('.checkbox-options');
+    const selectBox = document.getElementById('locationSelectBox');
+    const checkboxList = document.getElementById('locationCheckboxes');
+    const selectedText = selectBox.querySelector('.selected-text');
+    const searchInput = document.getElementById('locationSearch');
+
+    // Clear existing checkboxes and event listeners
+    locationContainer.innerHTML = '';
+    const oldSelectBox = document.getElementById('locationSelectBox');
+    const newSelectBox = oldSelectBox.cloneNode(true);
+    oldSelectBox.parentNode.replaceChild(newSelectBox, oldSelectBox);
+
+    // Get available locations based on university and course selection
+    const availableLocations = getAvailableLocations(country);
+
+    // Add locations as checkboxes
+    availableLocations.forEach(city => {
       const label = document.createElement('label');
       label.innerHTML = `<input type="checkbox" name="location" value="${city}"> ${city}`;
       locationContainer.appendChild(label);
     });
 
+    // Re-initialize event listeners
+    initializeDropdownListeners(newSelectBox, checkboxList, searchInput, locationContainer, selectedText);
+  }
+
+  function getAvailableLocations(country) {
+    const selectedUniversity = document.getElementById('university').value;
+    const selectedCourse = document.getElementById('course').value;
+
+    // If no university or course is selected, return all cities for the country
+    if (!selectedUniversity || !selectedCourse) {
+      return countryConfigs[country].cities;
+    }
+
+    // Filter locations based on selected university and course
+    const filteredLocations = new Set();
+    const data = universityData.filter(uni =>
+      uni.University_Name === selectedUniversity &&
+      uni.Course === selectedCourse
+    );
+
+    data.forEach(uni => {
+      const locations = uni.Location.split(/,\s*/).map(loc => loc.trim());
+      locations.forEach(loc => filteredLocations.add(loc));
+    });
+
+    return Array.from(filteredLocations).sort();
+  }
+
+  function initializeDropdownListeners(selectBox, checkboxList, searchInput, locationContainer, selectedText) {
+    // Toggle dropdown
+    selectBox.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const isActive = checkboxList.classList.contains('show');
+      checkboxList.classList.toggle('show');
+      selectBox.classList.toggle('active');
+
+      if (!isActive) {
+        searchInput.focus();
+      }
+    });
+
+    // Handle search
+    searchInput.addEventListener('input', function (e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const labels = locationContainer.querySelectorAll('label');
+
+      labels.forEach(label => {
+        const text = label.textContent.toLowerCase();
+        label.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!selectBox.contains(e.target) && !checkboxList.contains(e.target)) {
+        checkboxList.classList.remove('show');
+        selectBox.classList.remove('active');
+      }
+    });
+
+    // Handle checkbox changes
+    const checkboxes = locationContainer.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function () {
+        updateSelectedLocations(checkboxes, selectedText);
+      });
+    });
+  }
+
+  function updateSelectedLocations(checkboxes, selectedText) {
+    const selectedLocations = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
+    if (selectedLocations.length === 0) {
+      selectedText.textContent = 'Select Locations';
+    } else if (selectedLocations.length <= 2) {
+      selectedText.textContent = selectedLocations.join(', ');
+    } else {
+      selectedText.textContent = `${selectedLocations.length} locations selected`;
+    }
+  }
+
+  function setupFieldCheckboxes() {
     const fieldContainer = document.getElementById('fieldCheckboxes');
     fieldContainer.innerHTML = ''; // Clear existing checkboxes
     fieldsOfStudy.forEach(field => {
@@ -219,9 +624,6 @@ document.addEventListener('DOMContentLoaded', function () {
       label.innerHTML = `<input type="checkbox" name="field" value="${field}"> ${field}`;
       fieldContainer.appendChild(label);
     });
-
-    // Update fee range options with correct currency
-    updateFeeRangeOptions(country);
   }
 
   function updateFeeRangeOptions(country) {
@@ -339,7 +741,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('No universities to display');
       tableBody.innerHTML = `
         <tr>
-          <td colspan="11" class="no-results">
+          <td colspan="13" class="no-results">
             <div class="no-results-content">
               <h3>No universities match your selection</h3>
               <p>Try adjusting your filters:</p>
@@ -367,21 +769,26 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ensure all required fields are present
         const safeUni = {
           University_Name: uni.University_Name || 'N/A',
-          Degree: uni.Degree || 'N/A',
           Location: uni.Location || 'N/A',
+          Degree: uni.Degree || 'N/A',
+          Course: uni.Course || 'N/A',
+          Intake: uni.Intake || 'N/A',
           Percentage_CGPA: uni.Percentage_CGPA || 'N/A',
           English_Test: uni.English_Test || 'N/A',
           Study_Gap: uni.Study_Gap || 'N/A',
           Field_of_Study: uni.Field_of_Study || 'N/A',
           Fee: uni.Fee || 'N/A',
           Initial_Deposit: uni.Initial_Deposit || 'N/A',
-          Other_Remarks: uni.Other_Remarks || 'N/A'
+          Other_Remarks: uni.Other_Remarks || 'N/A',
+          Course_link: uni.Course_link || 'N/A'
         };
 
         row.innerHTML = `
           <td>${escapeHtml(safeUni.University_Name)}</td>
-          <td class="degree-match">${escapeHtml(safeUni.Degree)}</td>
-          <td>${formatListItems(safeUni.Location, activeFilters.locations)}</td>
+          <td>${escapeHtml(safeUni.Location)}</td>
+          <td>${escapeHtml(safeUni.Degree)}</td>
+          <td>${escapeHtml(safeUni.Course)}</td>
+          <td>${escapeHtml(safeUni.Intake)}</td>
           <td>${formatScore(safeUni.Percentage_CGPA, activeFilters.cgpa)}</td>
           <td>${formatListItems(safeUni.English_Test, activeFilters.englishTests, /,\s*|\/|and|or/)}</td>
           <td>${escapeHtml(safeUni.Study_Gap)}</td>
@@ -389,7 +796,9 @@ document.addEventListener('DOMContentLoaded', function () {
           <td>${formatCurrency(safeUni.Fee)}</td>
           <td>${formatCurrency(safeUni.Initial_Deposit)}</td>
           <td>${escapeHtml(safeUni.Other_Remarks)}</td>
-          <td><input type="text" class="program-name-input" placeholder="Enter program name"></td>
+          <td>${safeUni.Course_link !== 'N/A' ?
+            `<a href="${escapeHtml(safeUni.Course_link)}" target="_blank">View Course</a>` :
+            'N/A'}</td>
         `;
 
         tableBody.appendChild(row);
@@ -400,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Error displaying results:', error);
       tableBody.innerHTML = `
         <tr>
-          <td colspan="11" style="text-align: center; color: red;">
+          <td colspan="13" style="text-align: center; color: red;">
             Error displaying results. Please try again.
           </td>
         </tr>
@@ -473,14 +882,14 @@ document.addEventListener('DOMContentLoaded', function () {
     submitBtn.innerHTML = '<span class="loading-spinner"></span> Searching...';
 
     try {
-      // 1. Fetch data
       const rawData = await fetchDataFromGoogleSheets(config);
       if (!rawData || rawData.length === 0) {
         throw new Error("No university data available");
       }
 
-      // 2. Get filter values
       const filters = {
+        university: document.getElementById('university').value,
+        course: document.getElementById('course').value,
         degree: document.getElementById('degree').value,
         englishTests: Array.from(document.querySelectorAll('input[name="englishTest"]:checked'))
           .map(el => el.value),
@@ -493,12 +902,8 @@ document.addEventListener('DOMContentLoaded', function () {
       };
 
       console.log("Active filters:", filters);
-
-      // 3. Apply filtering with degree as primary filter
       const filteredData = filterUniversities(rawData, filters);
       console.log(`Found ${filteredData.length} matching records`);
-
-      // 4. Display results
       displayFilteredResults(filteredData, filters);
 
     } catch (error) {
@@ -512,95 +917,180 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Filter universities
   function filterUniversities(data, criteria) {
-    // If no filters selected, return all data
-    if (!criteria || Object.keys(criteria).length === 0) {
-      return data;
-    }
-
     return data.filter(university => {
-      // 1. Degree Level - ALWAYS apply strict exact match when selected
-      if (criteria.degree && criteria.degree !== "") {
-        const uniDegree = university.Degree ? university.Degree.trim().toLowerCase() : '';
-        if (uniDegree !== criteria.degree.trim().toLowerCase()) {
-          return false; // Skip if degree doesn't match exactly
-        }
-      }
-
-      // Only apply other filters if degree matches first
-      // 2. Location - Optional filter
+      // Location filter
       if (criteria.locations && criteria.locations.length > 0) {
-        if (!university.Location) return false;
-
-        const uniLocations = university.Location.toLowerCase().split(/,\s*/)
-          .map(loc => loc.trim());
-
-        const hasMatch = criteria.locations.some(loc =>
-          uniLocations.includes(loc.trim().toLowerCase())
-        );
-
-        if (!hasMatch) return false;
-      }
-
-      // 3. English Test - Optional filter
-      if (criteria.englishTests && criteria.englishTests.length > 0) {
-        if (!university.English_Test) return false;
-
-        const uniTests = university.English_Test.toLowerCase()
-          .split(/,\s*|\/|and|or/)
-          .map(test => test.trim());
-
-        const hasMatch = criteria.englishTests.some(test =>
-          uniTests.includes(test.trim().toLowerCase())
-        );
-
-        if (!hasMatch) return false;
-      }
-
-      // 4. Percentage/CGPA - Optional filter
-      if (criteria.cgpa) {
-        if (!university.Percentage_CGPA) return false;
-
-        const [minRange, maxRange] = criteria.cgpa.split('-').map(parseFloat);
-        const uniValue = parseFloat(university.Percentage_CGPA.replace(/[^\d.]/g, ''));
-
-        if (isNaN(uniValue)) return false;
-        if (uniValue < minRange || uniValue > maxRange) return false;
-      }
-
-      // 5. Field of Study - Optional filter
-      if (criteria.fields && criteria.fields.length > 0) {
-        if (!university.Field_of_Study) return false;
-
-        const uniFields = university.Field_of_Study.toLowerCase()
-          .split(/,\s*/)
-          .map(field => field.trim());
-
-        const hasMatch = criteria.fields.some(field =>
-          uniFields.includes(field.trim().toLowerCase())
-        );
-
-        if (!hasMatch) return false;
-      }
-
-      // 6. Fee - Optional filter
-      if (criteria.fee) {
-        if (!university.Fee) return false;
-
-        const feeValue = parseFloat(university.Fee.replace(/[^\d.]/g, ''));
-        if (isNaN(feeValue)) return false;
-
-        if (criteria.fee.endsWith('+')) {
-          const minFee = parseFloat(criteria.fee.replace(/[^\d.]/g, ''));
-          if (feeValue < minFee) return false;
-        } else {
-          const [minFee, maxFee] = criteria.fee.split('-').map(f => parseFloat(f.replace(/[^\d.]/g, '')));
-          if (feeValue < minFee || feeValue > maxFee) return false;
+        const uniLocations = university.Location.toLowerCase().split(/,\s*/).map(loc => loc.trim());
+        if (!criteria.locations.some(loc => uniLocations.includes(loc.toLowerCase().trim()))) {
+          return false;
         }
+      }
+
+      // Fee filter with exact matching
+      if (criteria.fee && criteria.fee !== "") {
+        const [minFee, maxFee] = criteria.fee.split('-').map(f =>
+          f === '+' ? Infinity : parseInt(f.replace(/[^0-9]/g, ''))
+        );
+        const uniFee = parseInt(university.Fee.replace(/[^0-9]/g, ''));
+
+        if (isNaN(uniFee) || uniFee < minFee || (maxFee !== Infinity && uniFee > maxFee)) {
+          return false;
+        }
+      }
+
+      // Keep other existing filter conditions
+      if (criteria.university && criteria.university !== "") {
+        if (university.University_Name !== criteria.university) return false;
+      }
+
+      if (criteria.course && criteria.course !== "") {
+        if (university.Course !== criteria.course) return false;
+      }
+
+      if (criteria.degree && criteria.degree !== "") {
+        if (!degreesMatch(university.Degree, criteria.degree)) return false;
       }
 
       return true;
     });
   }
+
+  // Global variables to store university and course data
+  let universityData = {};
+  let currentUniversities = [];
+
+  // Function to populate university dropdown based on country selection
+  async function populateUniversityDropdown(country) {
+    const universitySelect = document.getElementById('university');
+    universitySelect.innerHTML = '<option value="">Select University/College</option>';
+
+    try {
+      const data = await fetchDataFromGoogleSheets({
+        spreadsheetId: config.spreadsheetId,
+        apiKey: config.apiKey,
+        sheetName: countryConfigs[country].sheetName,
+        range: config.range
+      });
+
+      // Get unique universities
+      const universities = [...new Set(data.map(item => item.University_Name))].sort();
+      currentUniversities = universities;
+      universityData = data;
+
+      // Add universities to dropdown
+      universities.forEach(uni => {
+        const option = document.createElement('option');
+        option.value = uni;
+        option.textContent = uni;
+        universitySelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error populating universities:', error);
+    }
+  }
+
+  // Function to check if degrees match
+  function degreesMatch(courseDegree, selectedDegree) {
+    if (!courseDegree || !selectedDegree) return false;
+
+    courseDegree = courseDegree.toLowerCase().trim();
+    selectedDegree = selectedDegree.toLowerCase().trim();
+
+    // Direct match
+    if (courseDegree === selectedDegree) return true;
+
+    // Handle Bachelor degree variations
+    if (selectedDegree.includes('bachelor')) {
+      const yearMatch = selectedDegree.match(/\((\d)\s*Years?\)/);
+      if (yearMatch) {
+        const years = yearMatch[1];
+        return courseDegree.includes('bachelor') && courseDegree.includes(years + ' year');
+      }
+      return courseDegree.includes('bachelor');
+    }
+
+    // Handle Master degree variations
+    if (selectedDegree.includes('master')) {
+      const isTaught = selectedDegree.includes('taught');
+      const isResearch = selectedDegree.includes('research');
+
+      if (isTaught) {
+        return courseDegree.includes('master') &&
+          (courseDegree.includes('taught') || !courseDegree.includes('research'));
+      }
+      if (isResearch) {
+        return courseDegree.includes('master') && courseDegree.includes('research');
+      }
+      return courseDegree.includes('master');
+    }
+
+    // Handle other degree types
+    const degreeTypes = {
+      'foundation year': ['foundation', 'foundation year'],
+      'international year one/diploma': ['international year', 'year one', 'diploma', 'international diploma'],
+      'top-up': ['top-up', 'top up'],
+      'graduate certificate': ['graduate certificate', 'grad cert', 'graduate cert']
+    };
+
+    if (degreeTypes[selectedDegree]) {
+      return degreeTypes[selectedDegree].some(type => courseDegree.includes(type));
+    }
+
+    return false;
+  }
+
+  // Function to populate course dropdown based on university selection and degree
+  function populateCourseDropdown(universityName) {
+    const courseSelect = document.getElementById('course');
+    courseSelect.innerHTML = '<option value="">Select Course</option>';
+
+    if (!universityName) return;
+
+    const selectedDegree = document.getElementById('degree').value;
+    if (!selectedDegree) return;
+
+    // Filter courses for selected university and degree
+    const courses = universityData
+      .filter(item => {
+        const matchesUniversity = item.University_Name === universityName;
+        const matchesDegree = degreesMatch(item.Degree, selectedDegree);
+        return matchesUniversity && matchesDegree;
+      })
+      .map(item => item.Course)
+      .filter(course => course); // Remove empty/null values
+
+    // Add unique courses to dropdown
+    [...new Set(courses)].sort().forEach(course => {
+      const option = document.createElement('option');
+      option.value = course;
+      option.textContent = course;
+      courseSelect.appendChild(option);
+    });
+
+    // Log for debugging
+    console.log(`Found ${courses.length} courses for ${universityName} with degree ${selectedDegree}`);
+  }
+
+  // Add degree change event listener to update courses when degree changes
+  document.getElementById('degree').addEventListener('change', function () {
+    const selectedUniversity = document.getElementById('university').value;
+    if (selectedUniversity) {
+      populateCourseDropdown(selectedUniversity);
+    }
+    // Clear course selection when degree changes
+    document.getElementById('course').innerHTML = '<option value="">Select Course</option>';
+  });
+
+  // Add university change event listener
+  document.getElementById('university').addEventListener('change', function (e) {
+    populateCourseDropdown(e.target.value);
+    setupLocationDropdown(currentCountry);
+  });
+
+  // Add course change event listener
+  document.getElementById('course').addEventListener('change', function () {
+    setupLocationDropdown(currentCountry);
+  });
 });
 
 // Download functionality
@@ -994,20 +1484,20 @@ function downloadAsPDF(data, clientDetails) {
     }
 
     console.log('Creating PDF document...');
-    // Initialize jsPDF
+    // Initialize jsPDF with landscape orientation
     const doc = new window.jsPDF({
       orientation: 'landscape',
       unit: 'mm',
-      format: 'a4'
+      format: 'a3' // Changed to A3 for better fit of all columns
     });
 
     console.log('Adding header content...');
-    // Add title with smaller font
-    doc.setFontSize(14);
+    // Add title
+    doc.setFontSize(16);
     doc.text('APTITUDE MIGRATION - Options as per client Profile', 14, 15);
 
     // Add client details
-    doc.setFontSize(11);
+    doc.setFontSize(12);
     doc.setTextColor(60, 60, 60);
     doc.text(`Client Name: ${clientDetails.clientName}`, 14, 25);
     doc.text(`City: ${clientDetails.clientCity}`, 14, 32);
@@ -1021,8 +1511,10 @@ function downloadAsPDF(data, clientDetails) {
     // Prepare data with proper text handling
     const headers = [
       { title: "University", dataKey: "University_Name" },
-      { title: "Degree", dataKey: "Degree" },
       { title: "Location", dataKey: "Location" },
+      { title: "Degree", dataKey: "Degree" },
+      { title: "Course", dataKey: "Course" },
+      { title: "Intake", dataKey: "Intake" },
       { title: "Score", dataKey: "Percentage_CGPA" },
       { title: "English Test", dataKey: "English_Test" },
       { title: "Study Gap", dataKey: "Study_Gap" },
@@ -1030,10 +1522,10 @@ function downloadAsPDF(data, clientDetails) {
       { title: `Fee (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Fee" },
       { title: `Deposit (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Initial_Deposit" },
       { title: "Remarks", dataKey: "Other_Remarks" },
-      { title: "Program Name", dataKey: "Program_Name" }
+      { title: "Course Link", dataKey: "Course_link" }
     ];
 
-    // Process data to ensure proper formatting and handle null/undefined values
+    // Process data to ensure proper formatting
     const pdfData = data.map(row => {
       const processedRow = {};
       headers.forEach(header => {
@@ -1045,6 +1537,9 @@ function downloadAsPDF(data, clientDetails) {
         // Handle special cases for Fee and Initial_Deposit
         if (header.dataKey === 'Fee' || header.dataKey === 'Initial_Deposit') {
           processedRow[header.dataKey] = formatCurrencyForPDF(value);
+        } else if (header.dataKey === 'Course_link') {
+          // For course links, just show 'View Course' or 'N/A'
+          processedRow[header.dataKey] = value && value !== 'N/A' ? 'View Course' : 'N/A';
         } else {
           processedRow[header.dataKey] = String(value);
         }
@@ -1068,8 +1563,7 @@ function downloadAsPDF(data, clientDetails) {
         textColor: [40, 40, 40],
         lineColor: [200, 200, 200],
         lineWidth: 0.1,
-        minCellHeight: 5,
-        cellWidth: 'auto'
+        minCellHeight: 5
       },
       headStyles: {
         fillColor: [52, 152, 219],
@@ -1077,57 +1571,42 @@ function downloadAsPDF(data, clientDetails) {
         fontSize: 8,
         fontStyle: 'bold',
         halign: 'center',
-        minCellHeight: 10,
-        valign: 'middle'
+        minCellHeight: 10
       },
       columnStyles: {
-        0: { cellWidth: 30 }, // University
-        1: { cellWidth: 25 }, // Degree
-        2: { cellWidth: 25 }, // Location
-        3: { cellWidth: 15 }, // CGPA
-        4: { cellWidth: 25 }, // English Test
-        5: { cellWidth: 15 }, // Study Gap
-        6: { cellWidth: 25 }, // Field
-        7: { cellWidth: 20 }, // Fee
-        8: { cellWidth: 15 }, // Deposit
-        9: { cellWidth: 35 }, // Remarks
-        10: { cellWidth: 25 } // Program Name
+        0: { cellWidth: 30, halign: 'center' }, // University
+        1: { cellWidth: 25, halign: 'center' }, // Location
+        2: { cellWidth: 20, halign: 'center' }, // Degree
+        3: { cellWidth: 35, halign: 'center' }, // Course
+        4: { cellWidth: 15, halign: 'center' }, // Intake
+        5: { cellWidth: 15, halign: 'center' }, // Score
+        6: { cellWidth: 20, halign: 'center' }, // English Test
+        7: { cellWidth: 15, halign: 'center' }, // Study Gap
+        8: { cellWidth: 25, halign: 'center' }, // Field
+        9: { cellWidth: 20, halign: 'center' }, // Fee
+        10: { cellWidth: 20, halign: 'center' }, // Deposit
+        11: { cellWidth: 30, halign: 'center' }, // Remarks
+        12: { cellWidth: 20, halign: 'center' }  // Course Link
       },
       didParseCell: function (data) {
-        try {
-          const text = data.cell.text;
-          if (Array.isArray(text) && text.length > 0) {
-            const textLength = text.join(' ').length;
-            if (textLength > 50) {
-              data.cell.styles.minCellHeight = Math.max(data.cell.styles.minCellHeight, textLength / 20);
-            }
+        // Adjust cell height based on content
+        const text = data.cell.text;
+        if (Array.isArray(text) && text.length > 0) {
+          const textLength = text.join(' ').length;
+          if (textLength > 50) {
+            data.cell.styles.minCellHeight = Math.max(data.cell.styles.minCellHeight, textLength / 20);
           }
-          data.cell.styles.valign = 'middle';
-        } catch (e) {
-          console.error('Error in didParseCell:', e);
-        }
-      },
-      willDrawCell: function (data) {
-        try {
-          if (data.cell.text.length > 0) {
-            data.cell.styles.cellPadding = 2;
-          }
-        } catch (e) {
-          console.error('Error in willDrawCell:', e);
         }
       },
       didDrawPage: function (data) {
-        try {
-          doc.setFontSize(7);
-          doc.setTextColor(150);
-          doc.text(
-            `Page ${data.pageNumber} of ${data.pageCount}`,
-            doc.internal.pageSize.getWidth() - 15,
-            doc.internal.pageSize.getHeight() - 5
-          );
-        } catch (e) {
-          console.error('Error in didDrawPage:', e);
-        }
+        // Add page number
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(
+          `Page ${data.pageNumber} of ${data.pageCount}`,
+          doc.internal.pageSize.getWidth() - 20,
+          doc.internal.pageSize.getHeight() - 10
+        );
       }
     });
 
