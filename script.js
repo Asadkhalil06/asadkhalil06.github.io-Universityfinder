@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function () {
     spreadsheetId: '1UqQev32I997yJ7BVYjCf-VKt2NUS7mat1n0LZn_G6bI',
     apiKey: 'AIzaSyA03sD9ydP_SbJdntHVND5Htb4PkqQDx_c',
     sheetName: 'UK', // Default sheet
-    range: 'A1:K1000' // Expanded range to include more rows and the Program_Name column
+    range: 'A1:M1000' // Expanded range to include more rows and the Program_Name column
   };
 
   const fieldsOfStudy = ['Computer Science', 'Business Administration', 'Engineering',
@@ -540,17 +540,48 @@ document.addEventListener('DOMContentLoaded', function () {
   function getAvailableLocations(country) {
     const selectedUniversity = document.getElementById('university').value;
     const selectedCourse = document.getElementById('course').value;
+    const selectedDegree = document.getElementById('degree').value;
 
-    // If no university or course is selected, return all cities for the country
-    if (!selectedUniversity || !selectedCourse) {
+    // If no university is selected but degree is selected, show locations for all universities with that degree
+    if (!selectedUniversity && selectedDegree) {
+      const filteredLocations = new Set();
+      const relevantData = universityData.filter(uni => degreesMatch(uni.Degree, selectedDegree));
+
+      relevantData.forEach(uni => {
+        const locations = uni.Location.split(/,\s*/).map(loc => loc.trim());
+        locations.forEach(loc => filteredLocations.add(loc));
+      });
+
+      return Array.from(filteredLocations).sort();
+    }
+
+    // If no university or degree is selected, return all cities for the country
+    if (!selectedUniversity || !selectedDegree) {
       return countryConfigs[country].cities;
     }
 
-    // Filter locations based on selected university and course
+    // If university is selected but no course, show all locations for that university
+    if (selectedUniversity && !selectedCourse) {
+      const filteredLocations = new Set();
+      const universityData = universityData.filter(uni =>
+        uni.University_Name === selectedUniversity &&
+        (!selectedDegree || degreesMatch(uni.Degree, selectedDegree))
+      );
+
+      universityData.forEach(uni => {
+        const locations = uni.Location.split(/,\s*/).map(loc => loc.trim());
+        locations.forEach(loc => filteredLocations.add(loc));
+      });
+
+      return Array.from(filteredLocations).sort();
+    }
+
+    // If both university and course are selected, show specific locations
     const filteredLocations = new Set();
     const data = universityData.filter(uni =>
       uni.University_Name === selectedUniversity &&
-      uni.Course === selectedCourse
+      uni.Course === selectedCourse &&
+      (!selectedDegree || degreesMatch(uni.Degree, selectedDegree))
     );
 
     data.forEach(uni => {
@@ -783,6 +814,19 @@ document.addEventListener('DOMContentLoaded', function () {
           Course_link: uni.Course_link || 'N/A'
         };
 
+        // Create cell content with proper formatting
+        const otherRemarks = safeUni.Other_Remarks !== 'N/A' ?
+          `<div class="remarks-content">${escapeHtml(safeUni.Other_Remarks)}</div>` : 'N/A';
+
+        const courseLink = safeUni.Course_link !== 'N/A' ?
+          `<a href="${escapeHtml(safeUni.Course_link)}" 
+              target="_blank" 
+              class="course-link" 
+              data-url="${escapeHtml(safeUni.Course_link)}" 
+              title="${escapeHtml(safeUni.Course_link)}">
+            <i class="fas fa-external-link-alt"></i> View Course
+           </a>` : 'N/A';
+
         row.innerHTML = `
           <td>${escapeHtml(safeUni.University_Name)}</td>
           <td>${escapeHtml(safeUni.Location)}</td>
@@ -790,15 +834,13 @@ document.addEventListener('DOMContentLoaded', function () {
           <td>${escapeHtml(safeUni.Course)}</td>
           <td>${escapeHtml(safeUni.Intake)}</td>
           <td>${formatScore(safeUni.Percentage_CGPA, activeFilters.cgpa)}</td>
-          <td>${formatListItems(safeUni.English_Test, activeFilters.englishTests, /,\s*|\/|and|or/)}</td>
+          <td>${formatListItems(safeUni.English_Test, activeFilters.englishTests, /[,\s\/]|and|or/, true)}</td>
           <td>${escapeHtml(safeUni.Study_Gap)}</td>
           <td>${formatListItems(safeUni.Field_of_Study, activeFilters.fields)}</td>
           <td>${formatCurrency(safeUni.Fee)}</td>
           <td>${formatCurrency(safeUni.Initial_Deposit)}</td>
-          <td>${escapeHtml(safeUni.Other_Remarks)}</td>
-          <td>${safeUni.Course_link !== 'N/A' ?
-            `<a href="${escapeHtml(safeUni.Course_link)}" target="_blank">View Course</a>` :
-            'N/A'}</td>
+          <td class="remarks-cell">${otherRemarks}</td>
+          <td class="course-link-cell" data-url="${escapeHtml(safeUni.Course_link)}">${courseLink}</td>
         `;
 
         tableBody.appendChild(row);
@@ -823,10 +865,118 @@ document.addEventListener('DOMContentLoaded', function () {
     return text ? text.toString().replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'N/A';
   }
 
-  function formatListItems(value, filterItems, separator = /,\s*/) {
-    if (!value) return 'N/A';
-    if (!filterItems || filterItems.length === 0) return escapeHtml(value);
+  // Function to filter English test results based on selection
+  function filterEnglishTest(testString, selectedTests) {
+    if (!testString || testString === 'N/A') return 'N/A';
 
+    // If no tests selected, return all tests
+    if (!selectedTests || selectedTests.length === 0) {
+      return testString;
+    }
+
+    // Split the test string by common separators and clean up
+    const allTests = testString.split(/[,\/]|\s+(?:and|or)\s+/)
+      .map(test => test.trim())
+      .filter(test => test);
+
+    // Create regex patterns for each test type with more flexible matching
+    const patterns = {
+      'IELTS': /(?:IELTS|ielts)(?:[:\s-]*(?:overall)?[:\s-]*)?([\d.]+)?/i,
+      'PTE': /(?:PTE|pte)(?:[:\s-]*(?:overall)?[:\s-]*)?([\d.]+)?/i,
+      'TOEFL': /(?:TOEFL|toefl)(?:[:\s-]*(?:overall)?[:\s-]*)?([\d.]+)?/i,
+      'Duolingo': /(?:Duolingo|DET)(?:[:\s-]*(?:overall)?[:\s-]*)?([\d.]+)?/i,
+      'Cambridge': /(?:Cambridge|CAE|FCE)(?:[:\s-]*)?((?:[A-C][12]?)|(?:[\d.]+))?/i,
+      'Lang Cert': /(?:Lang[\s-]*Cert|LangCert)(?:[:\s-]*(?:overall)?[:\s-]*)?([\d.]+|[A-C][12]?)?/i,
+      'Oxford': /(?:Oxford)(?:[:\s-]*(?:overall)?[:\s-]*)?([\d.]+|[A-C][12]?)?/i,
+      'MOI': /(?:MOI|Medium\s+of\s+Instruction)/i
+    };
+
+    // Filter and match tests with better logging
+    const matchingTests = [];
+
+    // First try to match in the full string for each selected test
+    selectedTests.forEach(selected => {
+      const pattern = patterns[selected];
+      if (!pattern) return;
+
+      // For MOI, just check if the test contains the term
+      if (selected === 'MOI') {
+        if (pattern.test(testString)) {
+          matchingTests.push('MOI');
+          return;
+        }
+      }
+
+      // For other tests, try to match in the full string first
+      const match = testString.match(pattern);
+      if (match) {
+        const score = match[1] ? `: ${match[1]}` : '';
+        matchingTests.push(`${selected}${score}`);
+        console.log(`Full string match for ${selected} test:`, `${selected}${score}`);
+      }
+    });
+
+    // If no matches found in full string, try individual tests
+    if (matchingTests.length === 0) {
+      allTests.forEach(test => {
+        selectedTests.forEach(selected => {
+          const pattern = patterns[selected];
+          if (!pattern) return;
+
+          if (selected === 'MOI') {
+            if (pattern.test(test)) {
+              matchingTests.push('MOI');
+            }
+            return;
+          }
+
+          // Try to match with more flexible pattern
+          if (test.toLowerCase().includes(selected.toLowerCase())) {
+            const match = test.match(/[\d.]+|[A-C][12]?/i);
+            const score = match ? `: ${match[0]}` : '';
+            matchingTests.push(`${selected}${score}`);
+            console.log(`Matched ${selected} test with score:`, `${selected}${score}`);
+          }
+        });
+      });
+    }
+
+    // Remove duplicates and format the result
+    const uniqueTests = [...new Set(matchingTests)];
+    return uniqueTests.length > 0 ? uniqueTests.join(', ') : 'N/A';
+  }
+
+  // Update formatListItems to better handle test display
+  function formatListItems(value, filterItems, separator = /,\s*/, isEnglishTest = false) {
+    if (!value || value === 'N/A') return 'N/A';
+
+    // If no filters selected and it's English test, return all tests
+    if ((!filterItems || filterItems.length === 0) && isEnglishTest) {
+      return escapeHtml(value);
+    }
+
+    // If no filters selected for non-English test items, return as is
+    if (!filterItems || filterItems.length === 0) {
+      return escapeHtml(value);
+    }
+
+    if (isEnglishTest) {
+      // Filter English tests first
+      const filteredValue = filterEnglishTest(value, filterItems);
+      if (filteredValue === 'N/A') return 'N/A';
+
+      // Format the filtered value with better highlighting
+      return filteredValue.split(/,\s*/).map(item => {
+        const isMatch = filterItems.some(f =>
+          item.toLowerCase().includes(f.toLowerCase())
+        );
+        return isMatch ?
+          `<span class="filter-match">${escapeHtml(item.trim())}</span>` :
+          escapeHtml(item.trim());
+      }).join(', ');
+    }
+
+    // Handle other list items normally
     return value.split(separator)
       .map(item => {
         const isMatch = filterItems.some(f =>
@@ -882,7 +1032,13 @@ document.addEventListener('DOMContentLoaded', function () {
     submitBtn.innerHTML = '<span class="loading-spinner"></span> Searching...';
 
     try {
-      const rawData = await fetchDataFromGoogleSheets(config);
+      const rawData = await fetchDataFromGoogleSheets({
+        spreadsheetId: config.spreadsheetId,
+        apiKey: config.apiKey,
+        sheetName: countryConfigs[currentCountry].sheetName,
+        range: config.range
+      });
+
       if (!rawData || rawData.length === 0) {
         throw new Error("No university data available");
       }
@@ -926,6 +1082,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
 
+      // English Test filter
+      if (criteria.englishTests && criteria.englishTests.length > 0) {
+        const filteredTests = filterEnglishTest(university.English_Test, criteria.englishTests);
+        if (filteredTests === 'N/A') {
+          return false;
+        }
+      }
+
       // Fee filter with exact matching
       if (criteria.fee && criteria.fee !== "") {
         const [minFee, maxFee] = criteria.fee.split('-').map(f =>
@@ -938,16 +1102,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
 
-      // Keep other existing filter conditions
+      // Field of Study filter
+      if (criteria.fields && criteria.fields.length > 0) {
+        const uniFields = university.Field_of_Study.toLowerCase().split(/,\s*/).map(field => field.trim());
+        if (!criteria.fields.some(field => uniFields.includes(field.toLowerCase()))) {
+          return false;
+        }
+      }
+
+      // CGPA/Percentage filter
+      if (criteria.cgpa && criteria.cgpa !== "") {
+        const [minScore, maxScore] = criteria.cgpa.split('-').map(parseFloat);
+        const uniScore = parseFloat(university.Percentage_CGPA.replace(/[^\d.]/g, ''));
+
+        if (isNaN(uniScore) || uniScore < minScore || uniScore > maxScore) {
+          return false;
+        }
+      }
+
+      // University filter
       if (criteria.university && criteria.university !== "") {
         if (university.University_Name !== criteria.university) return false;
       }
 
+      // Course filter
       if (criteria.course && criteria.course !== "") {
         if (university.Course !== criteria.course) return false;
       }
 
-      if (criteria.degree && criteria.degree !== "") {
+      // Degree filter
+      if (criteria.degree && criteria.degree !== "" && criteria.degree !== "All") {
         if (!degreesMatch(university.Degree, criteria.degree)) return false;
       }
 
@@ -962,6 +1146,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Function to populate university dropdown based on country selection
   async function populateUniversityDropdown(country) {
     const universitySelect = document.getElementById('university');
+    const selectedDegree = document.getElementById('degree').value;
     universitySelect.innerHTML = '<option value="">Select University/College</option>';
 
     try {
@@ -972,10 +1157,18 @@ document.addEventListener('DOMContentLoaded', function () {
         range: config.range
       });
 
-      // Get unique universities
-      const universities = [...new Set(data.map(item => item.University_Name))].sort();
-      currentUniversities = universities;
+      // Store all data for later use
       universityData = data;
+
+      // Filter universities based on degree if selected and not "All"
+      let filteredData = data;
+      if (selectedDegree && selectedDegree.toLowerCase() !== 'all') {
+        filteredData = data.filter(item => degreesMatch(item.Degree, selectedDegree));
+      }
+
+      // Get unique universities from filtered data
+      const universities = [...new Set(filteredData.map(item => item.University_Name))].sort();
+      currentUniversities = universities;
 
       // Add universities to dropdown
       universities.forEach(uni => {
@@ -984,6 +1177,8 @@ document.addEventListener('DOMContentLoaded', function () {
         option.textContent = uni;
         universitySelect.appendChild(option);
       });
+
+      console.log(`Populated ${universities.length} universities for ${country}${selectedDegree ? ` with degree ${selectedDegree}` : ''}`);
     } catch (error) {
       console.error('Error populating universities:', error);
     }
@@ -993,47 +1188,77 @@ document.addEventListener('DOMContentLoaded', function () {
   function degreesMatch(courseDegree, selectedDegree) {
     if (!courseDegree || !selectedDegree) return false;
 
+    // If "All" is selected, return true for all degrees
+    if (selectedDegree.toLowerCase() === 'all') return true;
+
     courseDegree = courseDegree.toLowerCase().trim();
     selectedDegree = selectedDegree.toLowerCase().trim();
 
     // Direct match
     if (courseDegree === selectedDegree) return true;
 
-    // Handle Bachelor degree variations
-    if (selectedDegree.includes('bachelor')) {
-      const yearMatch = selectedDegree.match(/\((\d)\s*Years?\)/);
-      if (yearMatch) {
-        const years = yearMatch[1];
-        return courseDegree.includes('bachelor') && courseDegree.includes(years + ' year');
-      }
-      return courseDegree.includes('bachelor');
+    // Handle Foundation Year
+    if (selectedDegree === 'foundation year') {
+      return courseDegree.includes('foundation') ||
+        courseDegree.includes('preparatory year') ||
+        courseDegree.includes('pre-degree');
     }
 
-    // Handle Master degree variations
-    if (selectedDegree.includes('master')) {
-      const isTaught = selectedDegree.includes('taught');
-      const isResearch = selectedDegree.includes('research');
+    // Handle Certificate levels
+    if (selectedDegree.includes('certificate')) {
+      const certLevel = selectedDegree.match(/certificate\s+(i+|[1-4])/i);
+      if (certLevel) {
+        const level = certLevel[1];
+        // Convert Roman numerals if needed
+        const numericLevel = level.toLowerCase() === 'i' ? '1' :
+          level.toLowerCase() === 'ii' ? '2' :
+            level.toLowerCase() === 'iii' ? '3' :
+              level.toLowerCase() === 'iv' ? '4' : level;
+        return courseDegree.includes('certificate') &&
+          (courseDegree.includes(level.toLowerCase()) || courseDegree.includes(numericLevel));
+      }
+    }
 
-      if (isTaught) {
-        return courseDegree.includes('master') &&
-          (courseDegree.includes('taught') || !courseDegree.includes('research'));
-      }
-      if (isResearch) {
-        return courseDegree.includes('master') && courseDegree.includes('research');
-      }
+    // Handle Diploma and its variations
+    if (selectedDegree === 'diploma') {
+      return courseDegree.includes('diploma') &&
+        !courseDegree.includes('advanced') &&
+        !courseDegree.includes('leading to');
+    }
+    if (selectedDegree === 'diploma leading to bachelor') {
+      return courseDegree.includes('diploma') &&
+        (courseDegree.includes('leading to bachelor') ||
+          courseDegree.includes('pathway to bachelor') ||
+          courseDegree.includes('articulation to bachelor'));
+    }
+    if (selectedDegree.includes('advanced diploma')) {
+      return courseDegree.includes('advanced diploma') || courseDegree.includes('associate degree');
+    }
+
+    // Handle Bachelor's Degree
+    if (selectedDegree.includes("bachelor's degree")) {
+      return courseDegree.includes('bachelor') && !courseDegree.includes('honours');
+    }
+
+    // Handle Bachelor Honours / Grad Cert / Grad Dip
+    if (selectedDegree.includes('bachelor honours')) {
+      return courseDegree.includes('honours') ||
+        courseDegree.includes('graduate certificate') ||
+        courseDegree.includes('graduate diploma') ||
+        courseDegree.includes('grad cert') ||
+        courseDegree.includes('grad dip');
+    }
+
+    // Handle Master's Degree
+    if (selectedDegree.includes("master's degree")) {
       return courseDegree.includes('master');
     }
 
-    // Handle other degree types
-    const degreeTypes = {
-      'foundation year': ['foundation', 'foundation year'],
-      'international year one/diploma': ['international year', 'year one', 'diploma', 'international diploma'],
-      'top-up': ['top-up', 'top up'],
-      'graduate certificate': ['graduate certificate', 'grad cert', 'graduate cert']
-    };
-
-    if (degreeTypes[selectedDegree]) {
-      return degreeTypes[selectedDegree].some(type => courseDegree.includes(type));
+    // Handle Doctoral Degree
+    if (selectedDegree.includes('doctoral') || selectedDegree.includes('phd')) {
+      return courseDegree.includes('phd') ||
+        courseDegree.includes('doctoral') ||
+        courseDegree.includes('doctorate');
     }
 
     return false;
@@ -1047,13 +1272,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!universityName) return;
 
     const selectedDegree = document.getElementById('degree').value;
-    if (!selectedDegree) return;
 
-    // Filter courses for selected university and degree
+    // Filter courses for selected university and degree (if not "All")
     const courses = universityData
       .filter(item => {
         const matchesUniversity = item.University_Name === universityName;
-        const matchesDegree = degreesMatch(item.Degree, selectedDegree);
+        const matchesDegree = selectedDegree.toLowerCase() === 'all' ? true : degreesMatch(item.Degree, selectedDegree);
         return matchesUniversity && matchesDegree;
       })
       .map(item => item.Course)
@@ -1067,18 +1291,19 @@ document.addEventListener('DOMContentLoaded', function () {
       courseSelect.appendChild(option);
     });
 
-    // Log for debugging
     console.log(`Found ${courses.length} courses for ${universityName} with degree ${selectedDegree}`);
   }
 
-  // Add degree change event listener to update courses when degree changes
-  document.getElementById('degree').addEventListener('change', function () {
-    const selectedUniversity = document.getElementById('university').value;
-    if (selectedUniversity) {
-      populateCourseDropdown(selectedUniversity);
-    }
-    // Clear course selection when degree changes
+  // Add degree change event listener to update universities and courses when degree changes
+  document.getElementById('degree').addEventListener('change', async function () {
+    // Clear and update university dropdown
+    await populateUniversityDropdown(currentCountry);
+
+    // Clear course selection
     document.getElementById('course').innerHTML = '<option value="">Select Course</option>';
+
+    // Clear location checkboxes
+    setupLocationDropdown(currentCountry);
   });
 
   // Add university change event listener
@@ -1386,46 +1611,22 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-// Update getCurrentFilteredData function to get only visible/filtered rows
+// Update getCurrentFilteredData function to get actual URLs
 function getCurrentFilteredData() {
-  // Get all visible rows (not hidden by display: none)
   const rows = document.querySelectorAll('#resultsTable tbody tr:not([style*="display: none"])');
   if (rows.length === 0) return null;
 
   const headers = Array.from(document.querySelectorAll('#resultsTable thead th'))
     .map(th => th.textContent.trim().replace(/\s+/g, '_'));
 
-  // Get active filters
-  const activeFilters = getActiveFilters();
-  const hasActiveFilters = Object.values(activeFilters).some(filter =>
-    filter && (Array.isArray(filter) ? filter.length > 0 : filter !== '')
-  );
-
-  // If no filters are active, return all data
-  if (!hasActiveFilters) {
-    return Array.from(document.querySelectorAll('#resultsTable tbody tr')).map(row => {
-      const cells = Array.from(row.querySelectorAll('td'));
-      const rowData = {};
-      cells.forEach((cell, index) => {
-        if (headers[index] === 'Program_Name') {
-          const input = cell.querySelector('input');
-          rowData[headers[index]] = input ? input.value.trim() || 'N/A' : 'N/A';
-        } else {
-          rowData[headers[index]] = cell.textContent.trim();
-        }
-      });
-      return rowData;
-    });
-  }
-
-  // Return only filtered data
   return Array.from(rows).map(row => {
     const cells = Array.from(row.querySelectorAll('td'));
     const rowData = {};
     cells.forEach((cell, index) => {
-      if (headers[index] === 'Program_Name') {
-        const input = cell.querySelector('input');
-        rowData[headers[index]] = input ? input.value.trim() || 'N/A' : 'N/A';
+      if (headers[index] === 'Course_link') {
+        // Get the actual URL from the link's href attribute
+        const link = cell.querySelector('a');
+        rowData[headers[index]] = link ? link.getAttribute('href') : 'N/A';
       } else {
         rowData[headers[index]] = cell.textContent.trim();
       }
@@ -1459,7 +1660,12 @@ function downloadAsCSV(data) {
   URL.revokeObjectURL(url);
 }
 
-// Update downloadAsPDF function to handle filtered data
+// Function to handle course links differently for PDF
+function formatCourseLinkForPDF(link) {
+  return link && link !== 'N/A' ? link : 'N/A';
+}
+
+// Update downloadAsPDF function to use actual URLs
 function downloadAsPDF(data, clientDetails) {
   try {
     console.log('Starting PDF generation...');
@@ -1484,142 +1690,194 @@ function downloadAsPDF(data, clientDetails) {
     }
 
     console.log('Creating PDF document...');
-    // Initialize jsPDF with landscape orientation
+    // Initialize jsPDF with landscape orientation and larger format
     const doc = new window.jsPDF({
       orientation: 'landscape',
       unit: 'mm',
-      format: 'a3' // Changed to A3 for better fit of all columns
+      format: 'a3'
     });
 
-    console.log('Adding header content...');
-    // Add title
-    doc.setFontSize(16);
-    doc.text('APTITUDE MIGRATION - Options as per client Profile', 14, 15);
+    // Set margins
+    const margins = {
+      top: 20,
+      bottom: 20,
+      left: 10,
+      right: 10
+    };
 
-    // Add client details
+    console.log('Adding header content...');
+    // Add title with better positioning
+    doc.setFontSize(18);
+    doc.setTextColor(44, 62, 80); // Dark blue color
+    doc.text('APTITUDE MIGRATION - Options as per client Profile', doc.internal.pageSize.getWidth() / 2, margins.top, { align: 'center' });
+
+    // Add client details with better formatting
     doc.setFontSize(12);
     doc.setTextColor(60, 60, 60);
-    doc.text(`Client Name: ${clientDetails.clientName}`, 14, 25);
-    doc.text(`City: ${clientDetails.clientCity}`, 14, 32);
-
-    // Add date
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 39);
+    const clientDetailsY = margins.top + 15;
+    doc.text(`Client Name: ${clientDetails.clientName}`, margins.left, clientDetailsY);
+    doc.text(`City: ${clientDetails.clientCity}`, margins.left + 100, clientDetailsY);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, doc.internal.pageSize.getWidth() - margins.right - 50, clientDetailsY);
 
     console.log('Preparing table data...');
-    // Prepare data with proper text handling
+    // Prepare headers with proper formatting
     const headers = [
-      { title: "University", dataKey: "University_Name" },
-      { title: "Location", dataKey: "Location" },
-      { title: "Degree", dataKey: "Degree" },
-      { title: "Course", dataKey: "Course" },
-      { title: "Intake", dataKey: "Intake" },
-      { title: "Score", dataKey: "Percentage_CGPA" },
-      { title: "English Test", dataKey: "English_Test" },
-      { title: "Study Gap", dataKey: "Study_Gap" },
-      { title: "Field", dataKey: "Field_of_Study" },
-      { title: `Fee (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Fee" },
-      { title: `Deposit (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Initial_Deposit" },
-      { title: "Remarks", dataKey: "Other_Remarks" },
-      { title: "Course Link", dataKey: "Course_link" }
+      { title: "University", dataKey: "University_Name", width: 45 },
+      { title: "Location", dataKey: "Location", width: 35 },
+      { title: "Degree", dataKey: "Degree", width: 30 },
+      { title: "Course", dataKey: "Course", width: 45 },
+      { title: "Intake", dataKey: "Intake", width: 20 },
+      { title: "Score", dataKey: "Percentage_CGPA", width: 20 },
+      { title: "English Test", dataKey: "English_Test", width: 25 },
+      { title: "Study Gap", dataKey: "Study_Gap", width: 20 },
+      { title: "Field", dataKey: "Field_of_Study", width: 30 },
+      { title: `Fee (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Fee", width: 25 },
+      { title: `Deposit (${countryConfigs[currentCountry].currencySymbol})`, dataKey: "Initial_Deposit", width: 25 },
+      { title: "Remarks", dataKey: "Other_Remarks", width: 40 },
+      { title: "Course Link", dataKey: "Course_link", width: 45 }
     ];
 
-    // Process data to ensure proper formatting
+    // Store link positions for later processing
+    const linkPositions = [];
+
+    // Process data with proper formatting
     const pdfData = data.map(row => {
       const processedRow = {};
       headers.forEach(header => {
         let value = row[header.dataKey];
-        // Handle null/undefined values
-        if (value === null || value === undefined) {
-          value = 'N/A';
-        }
-        // Handle special cases for Fee and Initial_Deposit
-        if (header.dataKey === 'Fee' || header.dataKey === 'Initial_Deposit') {
-          processedRow[header.dataKey] = formatCurrencyForPDF(value);
-        } else if (header.dataKey === 'Course_link') {
-          // For course links, just show 'View Course' or 'N/A'
-          processedRow[header.dataKey] = value && value !== 'N/A' ? 'View Course' : 'N/A';
-        } else {
-          processedRow[header.dataKey] = String(value);
+
+        // Format different types of data
+        switch (header.dataKey) {
+          case 'Fee':
+          case 'Initial_Deposit':
+            processedRow[header.dataKey] = formatCurrencyForPDF(value);
+            break;
+          case 'Course_link':
+            // Ensure we're using the actual URL
+            processedRow[header.dataKey] = value !== 'N/A' ? value : 'N/A';
+            break;
+          case 'Other_Remarks':
+            processedRow[header.dataKey] = value ? value.replace(/\\n/g, '\n') : 'N/A';
+            break;
+          default:
+            processedRow[header.dataKey] = value || 'N/A';
         }
       });
       return processedRow;
     });
 
-    console.log('Generating table...');
+    // Calculate optimal table dimensions
+    const tableTop = clientDetailsY + 20;
+    const tableWidth = doc.internal.pageSize.getWidth() - margins.left - margins.right;
+
     // Generate the table with improved settings
     doc.autoTable({
       head: [headers.map(h => h.title)],
-      body: pdfData.map(row => headers.map(h => row[h.dataKey])),
-      startY: 45,
-      margin: { left: 5, right: 5 },
+      body: pdfData.map(row => {
+        return headers.map(h => {
+          // For Course_link column, return the actual URL
+          if (h.dataKey === 'Course_link') {
+            return row[h.dataKey];
+          }
+          return row[h.dataKey];
+        });
+      }),
+      startY: tableTop,
+      margin: margins,
       styles: {
-        fontSize: 7,
-        cellPadding: 2,
+        fontSize: 8,
+        cellPadding: { top: 3, right: 3, bottom: 3, left: 3 },
         overflow: 'linebreak',
         valign: 'middle',
         halign: 'center',
         textColor: [40, 40, 40],
         lineColor: [200, 200, 200],
         lineWidth: 0.1,
-        minCellHeight: 5
+        minCellHeight: 8,
+        cellWidth: 'wrap'
       },
       headStyles: {
-        fillColor: [52, 152, 219],
+        fillColor: [41, 128, 185],
         textColor: [255, 255, 255],
-        fontSize: 8,
+        fontSize: 9,
         fontStyle: 'bold',
         halign: 'center',
-        minCellHeight: 10
+        minCellHeight: 12
       },
       columnStyles: {
-        0: { cellWidth: 30, halign: 'center' }, // University
-        1: { cellWidth: 25, halign: 'center' }, // Location
-        2: { cellWidth: 20, halign: 'center' }, // Degree
-        3: { cellWidth: 35, halign: 'center' }, // Course
-        4: { cellWidth: 15, halign: 'center' }, // Intake
-        5: { cellWidth: 15, halign: 'center' }, // Score
-        6: { cellWidth: 20, halign: 'center' }, // English Test
-        7: { cellWidth: 15, halign: 'center' }, // Study Gap
-        8: { cellWidth: 25, halign: 'center' }, // Field
-        9: { cellWidth: 20, halign: 'center' }, // Fee
-        10: { cellWidth: 20, halign: 'center' }, // Deposit
-        11: { cellWidth: 30, halign: 'center' }, // Remarks
-        12: { cellWidth: 20, halign: 'center' }  // Course Link
+        0: { cellWidth: headers[0].width },
+        1: { cellWidth: headers[1].width },
+        2: { cellWidth: headers[2].width },
+        3: { cellWidth: headers[3].width },
+        4: { cellWidth: headers[4].width },
+        5: { cellWidth: headers[5].width },
+        6: { cellWidth: headers[6].width },
+        7: { cellWidth: headers[7].width },
+        8: { cellWidth: headers[8].width },
+        9: { cellWidth: headers[9].width },
+        10: { cellWidth: headers[10].width },
+        11: { cellWidth: headers[11].width, halign: 'left' },
+        12: {
+          cellWidth: headers[12].width,
+          halign: 'left',
+          textColor: [0, 0, 255], // Blue color for links
+          fontStyle: 'normal',
+          fontSize: 8
+        }
       },
       didParseCell: function (data) {
-        // Adjust cell height based on content
-        const text = data.cell.text;
-        if (Array.isArray(text) && text.length > 0) {
-          const textLength = text.join(' ').length;
-          if (textLength > 50) {
-            data.cell.styles.minCellHeight = Math.max(data.cell.styles.minCellHeight, textLength / 20);
-          }
+        // Store link positions for Course_link column and ensure URLs are shown
+        if (data.column.dataKey === 'Course_link' && data.cell.raw !== 'N/A') {
+          const url = data.cell.raw;
+          linkPositions.push({
+            text: url,
+            x: data.cell.x,
+            y: data.cell.y,
+            width: data.cell.width,
+            height: data.cell.height
+          });
+          // Ensure the URL is displayed
+          data.cell.text = url;
+        }
+      },
+      willDrawCell: function (data) {
+        // Make course links blue
+        if (data.column.dataKey === 'Course_link' && data.cell.raw !== 'N/A') {
+          data.cell.styles.textColor = [0, 0, 255];
+          // Ensure URL is shown instead of "View Course"
+          data.cell.text = data.cell.raw;
         }
       },
       didDrawPage: function (data) {
-        // Add page number
+        // Add page numbers
         doc.setFontSize(8);
-        doc.setTextColor(150);
+        doc.setTextColor(100, 100, 100);
+        const pageNumberText = `Page ${data.pageNumber} of ${data.pageCount}`;
         doc.text(
-          `Page ${data.pageNumber} of ${data.pageCount}`,
-          doc.internal.pageSize.getWidth() - 20,
-          doc.internal.pageSize.getHeight() - 10
+          pageNumberText,
+          doc.internal.pageSize.getWidth() - margins.right,
+          doc.internal.pageSize.getHeight() - margins.bottom,
+          { align: 'right' }
         );
+
+        // Add clickable links for this page
+        linkPositions.forEach(link => {
+          if (link.text && link.text !== 'N/A') {
+            doc.link(link.x, link.y, link.width, link.height, { url: link.text });
+          }
+        });
       }
     });
 
-    console.log('Saving PDF...');
     // Save the PDF
-    const filename = `university_results_${new Date().toISOString().slice(0, 10)}.pdf`;
+    const filename = `university_results_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`;
     doc.save(filename);
     console.log('PDF generated successfully!');
 
   } catch (error) {
-    console.error('Detailed error in PDF generation:', error);
+    console.error('Error in PDF generation:', error);
     console.error('Error stack:', error.stack);
-    alert(`Error generating PDF: ${error.message}. Please check the console for details.`);
+    alert('Error generating PDF. Please try again.');
   }
 }
 
